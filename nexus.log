@@ -1,0 +1,5 @@
+[2024-08-17T23:07:31.903Z] WSI INFO Listening on 8888
+[2024-08-17T23:07:33.303Z] WSI VERBOSE Upgrading ::ffff:127.0.0.1 to /racecontrol
+[2024-08-17T23:07:33.306Z] WSE VERBOSE Established ::ffff:127.0.0.1 on /racecontrol
+[2024-08-17T23:07:47.247Z] WSI VERBOSE Upgrading ::ffff:127.0.0.1 to /racecontrol
+[2024-08-17T23:07:47.249Z] WSE VERBOSE Established ::ffff:127.0.0.1 on /racecontrol
