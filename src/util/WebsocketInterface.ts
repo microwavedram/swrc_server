@@ -3,22 +3,18 @@ import log from "npmlog"
 import { parse } from "url"
 import { createServer, Server, IncomingMessage } from "http"
 import type { WebsocketEndpoint } from "./WebsocketEndpoint"
+import { getHeadToken } from "./HeadToken"
+import type { AuthWebsocket } from "./Websocket"
 
-interface WSIConfig {
-	token: string
-}
+interface WSIConfig {}
 
 export class WebsocketInterface {
 	private server: Server
 
 	private paths: { [path: string]: WebsocketEndpoint<any> } = {}
 
-	private readonly head_token: string
-
 	constructor(config: WSIConfig) {
 		this.server = createServer()
-
-		this.head_token = config.token
 	}
 
 	addPath(path: string, websocketEndpoint: WebsocketEndpoint<any>) {
@@ -27,11 +23,16 @@ export class WebsocketInterface {
 		websocketEndpoint.init()
 	}
 
+	getPath(path: string): WebsocketEndpoint<any> | null {
+		return this.paths[path]
+	}
+
 	#auth(request: IncomingMessage): boolean {
 		if (!request.url) return false
 
 		const { token } = parse(request.url, true).query
-		if (token === this.head_token) {
+		console.log(token, "+", getHeadToken())
+		if (token === getHeadToken()) {
 			return true
 		}
 
@@ -58,7 +59,7 @@ export class WebsocketInterface {
 				socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n")
 				socket.destroy()
 
-				log.verbose("WSI", `No Authorization`)
+				log.verbose("WSI", `Failed Authorization`)
 				return
 			}
 
@@ -92,7 +93,7 @@ export class WebsocketInterface {
 						socket,
 						head,
 						// @ts-ignore; this works but shitty typings
-						(client: WebSocket, message: IncomingMessage) => {
+						(client: AuthWebsocket, message: IncomingMessage) => {
 							endpoint.emit(
 								"connection",
 								client,

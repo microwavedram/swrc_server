@@ -7,7 +7,7 @@ function base64Encode(data: any) {
 export const PROTO = 0
 
 export const enum APIScope {
-	PTR = "ptr",
+	RC = "rc",
 }
 
 export function scopeDescriptor(scopes: APIScope[]) {

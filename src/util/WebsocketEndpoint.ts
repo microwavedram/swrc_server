@@ -1,7 +1,7 @@
 import log from "npmlog"
 import { WebSocketServer, type RawData } from "ws"
 import { IncomingMessage } from "http"
-import { AuthWebsocked as AuthWebsocket } from "./Websocket"
+import { AuthWebsocket } from "./Websocket"
 import type { SWRC } from ".."
 
 export abstract class WebsocketEndpoint<Protocol> extends WebSocketServer {
@@ -20,10 +20,10 @@ export abstract class WebsocketEndpoint<Protocol> extends WebSocketServer {
 	}
 
 	onMessage(client: WebSocket, packetType: Protocol, data: Buffer): void {}
-	onConnection(client: WebSocket): void {}
+	onConnection(client: AuthWebsocket): void {}
 
 	async sendPacket(
-		client: WebSocket,
+		client: AuthWebsocket,
 		packetType: Protocol,
 		data: any
 	): Promise<void> {
@@ -48,10 +48,10 @@ export abstract class WebsocketEndpoint<Protocol> extends WebSocketServer {
 		)
 
 		connection.on("message", (message: RawData) => {
-			const buffer = Buffer.from(message.toString())
+			const buffer = Buffer.from(message.toString("utf8"))
 
-			const packetId: Protocol = buffer.at(0) as Protocol
-			const data = buffer.subarray(1)
+			const packetId: Protocol = buffer.at(1) as Protocol
+			const data = buffer.subarray(2)
 
 			if (packetId == undefined) {
 				return

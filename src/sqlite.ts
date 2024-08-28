@@ -37,26 +37,9 @@ export default class SQLite {
 			"CREATE TABLE IF NOT EXISTS meta (key STRING PRIMARY KEY, value STRING)"
 		)
 
-		const head_token = await this.createHeadToken()
-		log.info("SQLITE", `HEAD-TOKEN: ${head_token}`)
-
-		const apikey = await this.createApiKey([APIScope.PTR])
+		const apikey = await this.createApiKey([APIScope.RC])
 
 		log.info("SQLITE", `API-KEY: ${apikey}`)
-	}
-
-	async createHeadToken(): Promise<string> {
-		const head = crypto.randomBytes(16).toString("hex")
-
-		const query = this.db.prepare(
-			`REPLACE INTO meta (key, value) VALUES ("head_token", $head)`
-		)
-
-		query.run({
-			$head: head,
-		})
-
-		return head
 	}
 
 	async createApiKey(scopes: APIScope[]): Promise<string> {
@@ -93,18 +76,5 @@ export default class SQLite {
 		}
 
 		return null
-	}
-
-	getHeadToken(): string {
-		const query = this.db.prepare(`SELECT value FROM meta WHERE key = ?`)
-
-		const result = query.get("head_token") as any | null
-
-		if (result.value) {
-			return result.value
-		}
-
-		log.error("SQLITE", "FAILED TO GET HEAD TOKEN")
-		process.exit(0)
 	}
 }
