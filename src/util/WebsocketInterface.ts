@@ -31,7 +31,7 @@ export class WebsocketInterface {
 		if (!request.url) return false
 
 		const { token } = parse(request.url, true).query
-		console.log(token, "+", getHeadToken())
+
 		if (token === getHeadToken()) {
 			return true
 		}
