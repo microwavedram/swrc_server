@@ -13,6 +13,7 @@ export const enum RacerPacket {
 	NEWRACE = 0x04,
 	UPDATE = 0x05,
 	MESSAGE = 0x07,
+	RACESTATE = 0x09,
 }
 
 export class RacerEndpoint extends WebsocketEndpoint<RacerPacket> {
@@ -50,6 +51,8 @@ export class RacerEndpoint extends WebsocketEndpoint<RacerPacket> {
 				client.authenticated = true
 
 				this.sendPacket(client, RacerPacket.HANDSHAKE, {})
+
+				log.info("RACER", `${username} connected on ${version}`)
 
 				if (this.swrc.current_race) {
 					this.sendPacket(

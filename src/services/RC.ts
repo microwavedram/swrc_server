@@ -4,6 +4,7 @@ import { parse } from "url"
 import log from "npmlog"
 import { APIScope } from "../util/KeyManager"
 import type { AuthWebsocket } from "../util/Websocket"
+import type { RaceState } from "../Race"
 
 export const enum RCPacket {
 	HELLO = 0x00,
@@ -12,6 +13,8 @@ export const enum RCPacket {
 	PUSHTRACK = 0x03,
 	MODIFYRACERS = 0x06,
 	MESSAGE = 0x07,
+	PITCROSS = 0x08,
+	RACESTATE = 0x09,
 }
 
 export const enum ModifyRacerPacketAction {
@@ -22,6 +25,15 @@ export const enum ModifyRacerPacketAction {
 export interface LineCrosses {
 	timestamp: number
 	checkpoint_crosses: { [checkpoint_id: string]: string[] }
+}
+
+export interface RaceStatePacket {
+	state: RaceState
+}
+
+export interface PitCrosses {
+	timestamp: number
+	pit_crosses: string[]
 }
 
 export interface PushTrackPacket {
@@ -44,6 +56,7 @@ export interface Track {
 	name: string
 	minimumLapTime: number
 	checkpoints: Checkpoint[]
+	pit: Checkpoint
 }
 
 export interface RCHandshake {
@@ -93,6 +106,8 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 				}
 
 				client.authenticated = true
+
+				log.info("RACER", `${username} connected on ${version}`)
 
 				this.sendPacket(client, RCPacket.HANDSHAKE, {})
 
@@ -164,6 +179,32 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 						message:
 							"Failed to modify racers due to no current active race",
 					})
+				}
+
+				break
+			case RCPacket.PITCROSS:
+				const pitcrosses = JSON.parse(data.toString()) as PitCrosses
+
+				if (this.swrc.current_race) {
+					pitcrosses.pit_crosses.forEach((name) => {
+						this.swrc.current_race?.handlePitCross(
+							name,
+							pitcrosses.timestamp
+						)
+					})
+				} else {
+					log.warn(
+						"RC",
+						"Recieved Checkpoint cross without active race"
+					)
+				}
+
+				break
+			case RCPacket.RACESTATE:
+				const racestate = JSON.parse(data.toString()) as RaceStatePacket
+
+				if (this.swrc.current_race) {
+					this.swrc.current_race.setState(racestate.state)
 				}
 
 				break

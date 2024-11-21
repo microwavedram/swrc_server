@@ -14,6 +14,7 @@ export interface Split {
 export class Racer {
 	name: string
 	lap: number = 0
+	pit: number = 0
 	splits: Split[] = []
 
 	constructor(name: string) {
@@ -21,12 +22,12 @@ export class Racer {
 	}
 }
 
-export enum RaceState {
-	SETUP,
-	QUALIFY,
-	PRE_RACE,
-	RACE,
-	POST_RACE,
+export const enum RaceState {
+	SETUP = "SETUP",
+	QUALIFY = "QUALIFY",
+	PRE_RACE = "PRE_RACE",
+	RACE = "RACE",
+	POST_RACE = "POST_RACE",
 }
 
 export interface RaceLeaderboardObject {
@@ -65,6 +66,24 @@ export class Race {
 		return null
 	}
 
+	setState(state: RaceState) {
+		this.state = state
+
+		const racerEndpoint = this.swrc.wsInterface.getPath(
+			"/racer"
+		) as RacerEndpoint
+
+		racerEndpoint?.clients.forEach((client) => {
+			racerEndpoint.sendPacket(
+				client as AuthWebsocket,
+				RacerPacket.RACESTATE,
+				{
+					state: this.state,
+				}
+			)
+		})
+	}
+
 	handleLineCross(
 		racer_name: string,
 		timestamp: number,
@@ -98,6 +117,30 @@ export class Race {
 		}
 
 		this.race_leaderboard = this.rebuildLeaderboard()
+	}
+
+	handlePitCross(race_name: string, timestamp: number) {
+		const racer = this.getRacerByName(race_name)
+
+		if (racer) {
+			racer.pit += 1
+
+			const racerEndpoint = this.swrc.wsInterface.getPath(
+				"/racer"
+			) as RacerEndpoint
+
+			if (racerEndpoint) {
+				racerEndpoint.clients.forEach((client) => {
+					racerEndpoint.sendPacket(
+						client as AuthWebsocket,
+						RacerPacket.MESSAGE,
+						{
+							message: `${racer.name} has completed pit ${racer.pit}`,
+						}
+					)
+				})
+			}
+		}
 	}
 
 	rebuildLeaderboard(): RaceLeaderboardObject[] {
@@ -221,6 +264,16 @@ export class Race {
 			}
 		})
 
+		const pit_map: { [name: string]: number } = {}
+		this.racers.forEach((racer) => {
+			pit_map[racer.name] = racer.pit
+		})
+
+		const lap_map: { [name: string]: number } = {}
+		this.racers.forEach((racer) => {
+			lap_map[racer.name] = racer.lap
+		})
+
 		racerEndpoint?.clients.forEach((client) => {
 			racerEndpoint.sendPacket(
 				client as AuthWebsocket,
@@ -229,6 +282,8 @@ export class Race {
 					racers: this.racers.map((racer) => racer.name),
 					race_lap_begin: this.lap_begin_times,
 					race_leaderboard: this.race_leaderboard,
+					racer_pits: pit_map,
+					racer_laps: lap_map,
 				}
 			)
 		})
