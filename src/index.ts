@@ -10,6 +10,8 @@ import { getHeadToken } from "./util/HeadToken"
 import { Race } from "./Race"
 import type { AuthWebsocket } from "./util/Websocket"
 
+export const MIN_VER = 220
+
 const sleep = async (ms: number) =>
 	new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -42,7 +44,7 @@ export class SWRC {
 	}
 
 	async start() {
-		log.verbose("SWRC", `HEAD-TOKEN: ${getHeadToken()}`)
+		log.verbose("SWRC", `HEAD-TOKEN: ${getHeadToken(new Date().getDate())}`)
 
 		this.wsInterface.addPath("/racecontrol", new RCEndpoint(this))
 		this.wsInterface.addPath("/racer", new RacerEndpoint(this))
@@ -74,6 +76,20 @@ export class SWRC {
 				data
 			)
 		})
+	}
+
+	endRace() {
+		const racerEndpoint = this.wsInterface.getPath("/racer")
+
+		racerEndpoint?.clients.forEach((client) => {
+			racerEndpoint.sendPacket(
+				client as AuthWebsocket,
+				RacerPacket.ENDRACE,
+				{}
+			)
+		})
+
+		this.current_race = null
 	}
 }
 

@@ -32,7 +32,11 @@ export class WebsocketInterface {
 
 		const { token } = parse(request.url, true).query
 
-		if (token === getHeadToken()) {
+		if (
+			token === getHeadToken(new Date().getDate()) ||
+			token === getHeadToken(new Date().getDate() - 1) ||
+			token === getHeadToken(new Date().getDate() + 1)
+		) {
 			return true
 		}
 
@@ -94,6 +98,8 @@ export class WebsocketInterface {
 						head,
 						// @ts-ignore; this works but shitty typings
 						(client: AuthWebsocket, message: IncomingMessage) => {
+							client.remoteAddress =
+								request.socket.remoteAddress || ""
 							endpoint.emit(
 								"connection",
 								client,

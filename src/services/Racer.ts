@@ -6,6 +6,8 @@ import { APIScope } from "../util/KeyManager"
 import log from "npmlog"
 import type { AuthWebsocket } from "../util/Websocket"
 import type { PushTrackPacket } from "./RC"
+import { semverToInt } from "../util/Ver"
+import { MIN_VER } from ".."
 
 export const enum RacerPacket {
 	HELLO = 0x00,
@@ -14,6 +16,7 @@ export const enum RacerPacket {
 	UPDATE = 0x05,
 	MESSAGE = 0x07,
 	RACESTATE = 0x09,
+	ENDRACE = 0x11,
 }
 
 export class RacerEndpoint extends WebsocketEndpoint<RacerPacket> {
@@ -42,6 +45,20 @@ export class RacerEndpoint extends WebsocketEndpoint<RacerPacket> {
 					return
 				}
 
+				if (semverToInt(version) < MIN_VER) {
+					log.warn(
+						"RACER",
+						`Kicking ${username} due to outdated ${semverToInt(
+							version
+						)} < ${MIN_VER}`
+					)
+					this.sendPacket(client, RacerPacket.MESSAGE, {
+						message: `Your mod version is out of date, minimum required is ${MIN_VER}`,
+					})
+					client.close(3000)
+					return
+				}
+
 				client.handshake = {
 					username,
 					uuid,
@@ -52,7 +69,12 @@ export class RacerEndpoint extends WebsocketEndpoint<RacerPacket> {
 
 				this.sendPacket(client, RacerPacket.HANDSHAKE, {})
 
-				log.info("RACER", `${username} connected on ${version}`)
+				log.info(
+					"RACER",
+					`${username} connected on ${version} ${semverToInt(
+						version
+					)}`
+				)
 
 				if (this.swrc.current_race) {
 					this.sendPacket(

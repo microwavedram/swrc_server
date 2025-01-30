@@ -3,7 +3,7 @@ import json
 
 events = []
 
-with open("swrc.log") as f:
+with open("swrc3.log") as f:
     for line in f.read().split("\n"):
 
         if "RC VERBOSE " in line and not "HEAD-TOKEN" in line and len(line) > 20 and "timestamp" in line and "checkpoint_crosses" in line:
@@ -36,16 +36,28 @@ for event in events:
 
                 last_cross[name] = event["timestamp"]
 
-                if (delta < flaps.get(name, 99999999999)):
+                if (delta < flaps.get(name, 99999999999) and delta > 20000):
                     flaps[name] = delta
 
-                if lap_counts[name] == 15 and not name in finished:
+                if lap_counts[name] == 25 and not name in finished:
                     finished.append(name)
                     print(name, flaps.get(name)/1000)
                 
                 if delta > 30000:
                     lap_counts[name] += 1
                     actual_events.append({"name": name, "timestamp": event["timestamp"]})
+
+
+
+ll = []
+
+for a, b in flaps.items():
+    ll.append((a, b))
+
+ll = sorted(ll, key=lambda x: x[1])
+
+for v in ll:
+    print(v)
 
 
 # for event in actual_events:

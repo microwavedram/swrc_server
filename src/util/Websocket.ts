@@ -7,4 +7,5 @@ export interface Handshake {
 export class AuthWebsocket extends WebSocket {
 	authenticated: boolean = false
 	handshake: Handshake | undefined
+	remoteAddress: string = ""
 }
