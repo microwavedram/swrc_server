@@ -10,7 +10,7 @@ import { getHeadToken } from "./util/HeadToken"
 import { Race } from "./Race"
 import type { AuthWebsocket } from "./util/Websocket"
 
-export const MIN_VER = 220
+export const MIN_VER = 240
 
 const sleep = async (ms: number) =>
 	new Promise((resolve) => setTimeout(resolve, ms))

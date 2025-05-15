@@ -75,6 +75,8 @@ export class Race {
 
 	race_leaderboard: RaceLeaderboardObject[] = []
 	lap_begin_times: PlayerSplit[] = []
+	timer_start: number = -1
+	timer_duration: number = -1
 
 	constructor(swrc: SWRC, raceData: PushTrackPacket) {
 		this.swrc = swrc
@@ -533,6 +535,8 @@ export class Race {
 					racer_pits: pit_map,
 					racer_laps: lap_map,
 					flap: this.flap_stack[this.flap_stack.length - 1],
+					timer_start: this.timer_start,
+					timer_duration: this.timer_duration,
 				}
 			)
 		})
