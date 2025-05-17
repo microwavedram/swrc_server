@@ -23,6 +23,7 @@ export const enum RCPacket {
 	ENDRACE = 0x11,
 	SPEEDTRAP = 0x12,
 	DEBUGEVAL = 0x13,
+	TIMER = 0x14,
 }
 
 export const enum ModifyRacerPacketAction {
@@ -37,6 +38,11 @@ export interface LineCrosses {
 
 export interface RaceStatePacket {
 	state: RaceState
+}
+
+export interface TimerPacket {
+	start_time: number
+	duration: number
 }
 
 export interface PitCrosses {
@@ -334,6 +340,17 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 				}
 
 				break
+			case RCPacket.TIMER:
+				const timer = JSON.parse(data.toString()) as TimerPacket
+
+				if (this.swrc.current_race) {
+					this.swrc.current_race.timer_start = timer.start_time
+					this.swrc.current_race.timer_duration = timer.duration
+				}
+				log.warn("RC", `ÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ`)
+
+				break
+
 			default:
 				log.warn("RC", `Unknown packetId ${packetType}`)
 				break
