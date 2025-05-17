@@ -1,10 +1,12 @@
 import jinja2
 import json
 import math
+import sys
+import os.path
 
-race_name = "Formula B S2R2 - Circuit of kings"
-lap_total = 18
-pit_total = 2
+race_name = "Formula A S2R9 - Ithrun"
+lap_total = 24
+pit_total = 3
 
 fout = "index.html"
 
@@ -74,6 +76,8 @@ def anticheat(speed_traps):
 
         speed = d/delta
 
+
+        print(trap["player"], delta)
 
         deltas.append((trap["player"], delta))
         
@@ -146,6 +150,8 @@ def lap_data(crosses):
 
     by_checkpoint = {}
 
+    
+
 
     for player in players:
         k = (len(player["laps"])) * largest_checkpoint + player["splits"][-1]["checkpoint_id"]
@@ -157,7 +163,9 @@ def lap_data(crosses):
     
     for checkpoint_id, players in by_checkpoint.items():
         by_checkpoint[checkpoint_id] = sorted(players, key=lambda x: x["splits"][-1]["timestamp"])
-        
+
+
+
 
     leaderboard = []
 
@@ -223,6 +231,7 @@ def main():
     crosses = []
     pits = []
     pit_enters = []
+    player_events = []
 
     for part in chunks:
         full = "".join(part)
@@ -246,6 +255,50 @@ def main():
             parsed = json.loads(part)
 
             pit_enters.append(parsed)
+        elif "RC VERBOSE 6" in prefix:
+            parsed = json.loads(part)
+
+            player_events.append(parsed)
+    
+    if len(sys.argv) == 3 and sys.argv[1] == "--transform":
+        if not os.path.exists("./races"):
+            os.mkdir("races")
+        with open(f"./races/{sys.argv[2]}.race", "w") as fh:
+
+            lines = []
+
+            for i, action in enumerate(player_events):
+                lines.append((i, "PLAYER", action["action"], action["racer_name"]))
+
+            for cross in crosses:
+                timestamp = cross["timestamp"]
+                for checkpointid, players in cross["checkpoint_crosses"].items():
+                    for player in players:
+                        lines.append((timestamp, "CHECKPOINT", checkpointid, player))
+
+            for pit in pits:
+                timestamp = pit["timestamp"]
+                for player in pit["pit_crosses"]:
+                        lines.append((timestamp, "PIT", player))
+
+            for pit in pit_enters:
+                timestamp = pit["timestamp"]
+                for player in pit["pit_enter_crosses"]:
+                        lines.append((timestamp, "PIT_ENTER", player))
+
+            for pit in pit_enters:
+                timestamp = pit["timestamp"]
+                for player in pit["pit_enter_crosses"]:
+                        lines.append((timestamp, "PIT_ENTER", player))
+
+
+                        
+
+            lines = sorted(lines, key = lambda x: x[0])
+
+            for line in lines:
+                fh.write(" ".join([str(x) for x in line]) + "\n")
+                        
 
     anticheat(speed_traps)
 

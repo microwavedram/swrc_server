@@ -1,6 +1,8 @@
 import log from "npmlog"
 import config from "../config.toml"
 
+import { createWriteStream, WriteStream } from "fs"
+
 import type { PushTrackPacket, RCEndpoint, Track } from "./services/RC"
 import type { SWRC } from "."
 import { RacerEndpoint, RacerPacket } from "./services/Racer"
@@ -76,10 +78,14 @@ export class Race {
 	race_leaderboard: RaceLeaderboardObject[] = []
 	lap_begin_times: PlayerSplit[] = []
 
+	_raceStream: WriteStream
+
 	constructor(swrc: SWRC, raceData: PushTrackPacket) {
 		this.swrc = swrc
 		this.id = raceData.race_id
 		this.track = raceData.track
+
+		this._raceStream = createWriteStream(`./races/${this.id}.race`)
 	}
 
 	getRacerByName(name: string): Racer | null {
@@ -192,6 +198,8 @@ export class Race {
 		checkpoint_index: number
 	) {
 		const racer = this.getRacerByName(racer_name)
+
+		this._raceStream.write(`${timestamp} ${racer_name} ${checkpoint_index}`)
 
 		if (racer) {
 			const last_split = racer.splits[racer.splits.length - 1]

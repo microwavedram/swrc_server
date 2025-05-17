@@ -3,7 +3,7 @@ import json
 
 events = []
 
-with open("swrc.log") as f:
+with open("s.log") as f:
     for line in f.read().split("\n"):
 
         if "RC VERBOSE " in line and not "HEAD-TOKEN" in line and len(line) > 20 and "timestamp" in line and "checkpoint_crosses" in line:
@@ -24,7 +24,7 @@ for event in events:
                 if not cross in last_checkpoints:
                     last_checkpoints[cross] = -1
 
-                if int(checkpointid) != (last_checkpoints[cross] + 1) % 7:
+                if int(checkpointid) != (last_checkpoints[cross] + 1) % 2:
                     # print("miscount", cross, "-", checkpointid, last_checkpoints[cross])
                     pass
 
