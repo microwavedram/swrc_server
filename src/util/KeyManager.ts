@@ -8,6 +8,7 @@ export const PROTO = 0
 
 export const enum APIScope {
 	RC = "rc",
+	WEB = "web",
 }
 
 export function scopeDescriptor(scopes: APIScope[]) {

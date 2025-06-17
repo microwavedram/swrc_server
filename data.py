@@ -4,9 +4,9 @@ import math
 import sys
 import os.path
 
-race_name = "Formula A S2R9 - Ithrun"
-lap_total = 24
-pit_total = 3
+race_name = "Race of Nations 2 d2 @ Libraring"
+lap_total = 12
+pit_total = 1
 
 fout = "index.html"
 

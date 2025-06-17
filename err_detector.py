@@ -3,7 +3,7 @@ import json
 
 events = []
 
-with open("s.log") as f:
+with open("swrc.log") as f:
     for line in f.read().split("\n"):
 
         if "RC VERBOSE " in line and not "HEAD-TOKEN" in line and len(line) > 20 and "timestamp" in line and "checkpoint_crosses" in line:

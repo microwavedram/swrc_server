@@ -37,7 +37,7 @@ export default class SQLite {
 			"CREATE TABLE IF NOT EXISTS meta (key STRING PRIMARY KEY, value STRING)"
 		)
 
-		const apikey = await this.createApiKey([APIScope.RC])
+		const apikey = await this.createApiKey([APIScope.RC, APIScope.WEB])
 
 		log.info("SQLITE", `API-KEY: ${apikey}`)
 	}

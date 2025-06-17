@@ -2,3 +2,7 @@ update_speed = 250
 checkpoint_reset_speed = 5000
 port = 7777
 eval_users = ["localhackerman"]
+
+[express]
+enabled = true
+port = 8523

@@ -10,7 +10,10 @@ import { getHeadToken } from "./util/HeadToken"
 import { Race } from "./Race"
 import type { AuthWebsocket } from "./util/Websocket"
 
-export const MIN_VER = 240
+import express, { type NextFunction } from "express"
+import { APIScope } from "./util/KeyManager"
+
+export const MIN_VER = 231
 
 const sleep = async (ms: number) =>
 	new Promise((resolve) => setTimeout(resolve, ms))
@@ -20,6 +23,8 @@ export class SWRC {
 
 	current_race: Race | null = null
 	wsInterface: WebsocketInterface = new WebsocketInterface({})
+
+	express = express()
 
 	constructor() {
 		const writeStream = fs.createWriteStream("swrc.log")
@@ -43,6 +48,22 @@ export class SWRC {
 		}
 	}
 
+	auth(username: string, password: string): boolean {
+		log.verbose(username, password)
+
+		if (username != "swrc") return false
+
+		const key_info = this.sqlite.getApiKey(password)
+
+		if (key_info != null) {
+			if (key_info.scopes.includes(APIScope.WEB)) {
+				return true
+			}
+		}
+
+		return false
+	}
+
 	async start() {
 		log.verbose("SWRC", `HEAD-TOKEN: ${getHeadToken(new Date().getDate())}`)
 
@@ -50,6 +71,18 @@ export class SWRC {
 		this.wsInterface.addPath("/racer", new RacerEndpoint(this))
 
 		this.wsInterface.listen(config.port)
+
+		this.express.use(express.static("races"))
+
+		this.express.get("/", (request, response) => {
+			response.status(2001)
+		})
+
+		if (config.express.enabled) {
+			this.express.listen(config.express.port, () => {
+				log.info("EXPRESS", `Listening on ${config.express.port}`)
+			})
+		}
 
 		while (true) {
 			const update_begin = Date.now()

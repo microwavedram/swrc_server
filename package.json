@@ -4,6 +4,7 @@
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/express": "^5.0.3",
     "typescript-plugin-toml": "^0.3.1"
   },
   "peerDependencies": {
@@ -11,6 +12,8 @@
   },
   "dependencies": {
     "@types/npmlog": "^7.0.0",
+    "express": "^5.1.0",
+    "express-basic-auth": "^1.2.1",
     "npmlog-file": "^0.1.4"
   }
 }

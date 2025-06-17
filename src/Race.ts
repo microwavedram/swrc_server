@@ -136,6 +136,10 @@ export class Race {
 			}`
 		)
 
+		this._raceStream.write(
+			`${Date.now()} META LAPTIME ${racer.name} ${lap_time}\n`
+		)
+
 		if (
 			this.flap_stack.length == 0 ||
 			lap_time < this.flap_stack[this.flap_stack.length - 1].time
@@ -201,7 +205,9 @@ export class Race {
 	) {
 		const racer = this.getRacerByName(racer_name)
 
-		this._raceStream.write(`${timestamp} ${racer_name} ${checkpoint_index}`)
+		this._raceStream.write(
+			`${timestamp} CHECKPOINT ${checkpoint_index} ${racer_name}\n`
+		)
 
 		if (racer) {
 			const last_split = racer.splits[racer.splits.length - 1]
@@ -262,6 +268,8 @@ export class Race {
 			racer.pit += 1
 			racer.pit_splits.push({ checkpoint_index: 0, timestamp })
 
+			this._raceStream.write(`${Date.now()} PIT ${racer.name}\n`)
+
 			const racerEndpoint = this.swrc.wsInterface.getPath(
 				"/racer"
 			) as RacerEndpoint
@@ -287,6 +295,8 @@ export class Race {
 
 		if (racer) {
 			racer.pit_splits.push({ checkpoint_index: 1, timestamp })
+
+			this._raceStream.write(`${Date.now()} PIT_ENTER ${racer.name}\n`)
 
 			const racerEndpoint = this.swrc.wsInterface.getPath(
 				"/racer"
@@ -558,6 +568,8 @@ export class Race {
 		this.racers.push(new Racer(player_name))
 
 		this.race_leaderboard = this.rebuildLeaderboard()
+
+		this._raceStream.write(`${Date.now()} PLAYER ADD ${player_name}\n`)
 	}
 
 	removePlayer(player_name: string) {
@@ -566,5 +578,7 @@ export class Race {
 		this.racers = this.racers.filter((racer) => racer.name != player_name)
 
 		this.race_leaderboard = this.rebuildLeaderboard()
+
+		this._raceStream.write(`${Date.now()} PLAYER REMOVE ${player_name}\n`)
 	}
 }
