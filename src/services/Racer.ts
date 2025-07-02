@@ -80,6 +80,8 @@ export class RacerEndpoint extends WebsocketEndpoint<Packets> {
 					this.sendPacket(client as AuthWebsocket, Packets.NEWRACE, {
 						race_id: this.session.race.id,
 						track: this.session.race.track,
+						total_laps: this.session.race.total_laps,
+						total_pits: this.session.race.total_pits,
 					} as PushTrackPacket)
 
 					this.sendPacket(
