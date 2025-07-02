@@ -226,6 +226,7 @@ export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 
 				delete this.swrc.sessions[end_session_packet.session]
 
+				break
 			default:
 				log.warn("SERVER", `Unknown packetId ${packetType}`)
 				break

@@ -5,7 +5,7 @@ import { KeyScope } from "../util/Key"
 
 import log from "npmlog"
 import type { AuthWebsocket } from "../util/Websocket"
-import type { PushTrackPacket } from "./RC"
+import type { PushTrackPacket, RaceStatePacket } from "./RC"
 import { semverToInt } from "../util/Ver"
 import { Session } from ".."
 import { PROTOCOL, Packets } from "../Protocol"
@@ -81,6 +81,14 @@ export class RacerEndpoint extends WebsocketEndpoint<Packets> {
 						race_id: this.session.race.id,
 						track: this.session.race.track,
 					} as PushTrackPacket)
+
+					this.sendPacket(
+						client as AuthWebsocket,
+						Packets.RACESTATE,
+						{
+							state: this.session.race.state,
+						} as RaceStatePacket
+					)
 				}
 
 				break
