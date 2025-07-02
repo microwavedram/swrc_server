@@ -155,6 +155,8 @@ export class SWRC {
 		this.wsInterface.addPath("/", root_endpoint)
 		this.wsInterface.listen(config.port)
 
+		log.verbose("SWRC", "HEAD: " + getHeadToken(new Date().getDate()))
+
 		this.express.use("/races", express.static("races"))
 		this.express.get("/races/:name", (req, res, next) => {
 			const filename = req.params.name + ".race"
@@ -190,15 +192,6 @@ export class SWRC {
 		})
 
 		this.express.enable("trust proxy")
-
-		console.log(getHeadToken(2))
-
-		this.express.use((req, res, next) => {
-			if (req.headers["x-forwarded-proto"] !== "https") {
-				return res.redirect(`https://${req.headers.host}${req.url}`)
-			}
-			next()
-		})
 
 		this.express.use("/", express.static("public"))
 		this.express.get("/", (request, response) => {
