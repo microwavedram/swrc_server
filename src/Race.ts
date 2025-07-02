@@ -4,9 +4,10 @@ import config from "../config.toml"
 import { createWriteStream, WriteStream } from "fs"
 
 import type { PushTrackPacket, RCEndpoint, Track } from "./services/RC"
-import type { SWRC } from "."
-import { RacerEndpoint, RacerPacket } from "./services/Racer"
+import type { Session, SWRC } from "."
+import { RacerEndpoint } from "./services/Racer"
 import type { AuthWebsocket } from "./util/Websocket"
+import { Packets } from "./Protocol"
 
 export interface Split {
 	timestamp: number
@@ -64,7 +65,7 @@ export interface SpeedTrapResult {
 }
 
 export class Race {
-	swrc: SWRC
+	session: Session
 
 	id: string
 	track: Track
@@ -82,8 +83,8 @@ export class Race {
 
 	_raceStream: WriteStream
 
-	constructor(swrc: SWRC, raceData: PushTrackPacket) {
-		this.swrc = swrc
+	constructor(session: Session, raceData: PushTrackPacket) {
+		this.session = session
 		this.id = raceData.race_id
 		this.track = raceData.track
 
@@ -105,18 +106,8 @@ export class Race {
 	setState(state: RaceState) {
 		this.state = state
 
-		const racerEndpoint = this.swrc.wsInterface.getPath(
-			"/racer"
-		) as RacerEndpoint
-
-		racerEndpoint?.clients.forEach((client) => {
-			racerEndpoint.sendPacket(
-				client as AuthWebsocket,
-				RacerPacket.RACESTATE,
-				{
-					state: this.state,
-				}
-			)
+		this.session.racer_endpoint.sendAllPacket(Packets.RACESTATE, {
+			state: this.state,
 		})
 	}
 
@@ -157,45 +148,32 @@ export class Race {
 		if (this.getFlap(racer) != -1) {
 			delta = lap_time - this.getFlap(racer)
 		}
-		const racerEndpoint = this.swrc.wsInterface.getPath(
-			"/racer"
-		) as RacerEndpoint
 
-		if (racerEndpoint) {
-			racerEndpoint.clients.forEach((client) => {
-				if (
-					(client as AuthWebsocket).handshake?.username == racer.name
-				) {
-					racerEndpoint.sendPacket(
-						client as AuthWebsocket,
-						RacerPacket.MESSAGE,
-						{
-							message: `You have completed a lap in §2${
-								lap_time / 1000
-							} ${delta / 1000}`,
-						}
-					)
-				}
-			})
-		}
-
-		const rcEndpoint = this.swrc.wsInterface.getPath(
-			"/racecontrol"
-		) as RCEndpoint
-
-		if (rcEndpoint) {
-			rcEndpoint.clients.forEach((client) => {
-				racerEndpoint.sendPacket(
+		this.session.racer_endpoint.clients.forEach((client) => {
+			if ((client as AuthWebsocket).handshake?.username == racer.name) {
+				this.session.racer_endpoint.sendPacket(
 					client as AuthWebsocket,
-					RacerPacket.MESSAGE,
+					Packets.MESSAGE,
 					{
-						message: `${racer.name} have completed a lap in §2${
+						message: `You have completed a lap in §2${
 							lap_time / 1000
 						} ${delta / 1000}`,
 					}
 				)
-			})
-		}
+			}
+		})
+
+		this.session.rc_endpoint.clients.forEach((client) => {
+			this.session.racer_endpoint.sendPacket(
+				client as AuthWebsocket,
+				Packets.MESSAGE,
+				{
+					message: `${racer.name} have completed a lap in §2${
+						lap_time / 1000
+					} ${delta / 1000}`,
+				}
+			)
+		})
 	}
 
 	handleLineCross(
@@ -270,21 +248,15 @@ export class Race {
 
 			this._raceStream.write(`${Date.now()} PIT ${racer.name}\n`)
 
-			const racerEndpoint = this.swrc.wsInterface.getPath(
-				"/racer"
-			) as RacerEndpoint
-
-			if (racerEndpoint) {
-				racerEndpoint.clients.forEach((client) => {
-					racerEndpoint.sendPacket(
-						client as AuthWebsocket,
-						RacerPacket.MESSAGE,
-						{
-							message: `${racer.name} has completed pit ${racer.pit}`,
-						}
-					)
-				})
-			}
+			this.session.racer_endpoint.clients.forEach((client) => {
+				this.session.racer_endpoint.sendPacket(
+					client as AuthWebsocket,
+					Packets.MESSAGE,
+					{
+						message: `${racer.name} has completed pit ${racer.pit}`,
+					}
+				)
+			})
 		}
 
 		this.race_leaderboard = this.rebuildLeaderboard()
@@ -298,21 +270,15 @@ export class Race {
 
 			this._raceStream.write(`${Date.now()} PIT_ENTER ${racer.name}\n`)
 
-			const racerEndpoint = this.swrc.wsInterface.getPath(
-				"/racer"
-			) as RacerEndpoint
-
-			if (racerEndpoint) {
-				racerEndpoint.clients.forEach((client) => {
-					racerEndpoint.sendPacket(
-						client as AuthWebsocket,
-						RacerPacket.MESSAGE,
-						{
-							message: `${racer.name} has entered the pit lane`,
-						}
-					)
-				})
-			}
+			this.session.racer_endpoint.clients.forEach((client) => {
+				this.session.racer_endpoint.sendPacket(
+					client as AuthWebsocket,
+					Packets.MESSAGE,
+					{
+						message: `${racer.name} has entered the pit lane`,
+					}
+				)
+			})
 		}
 
 		this.race_leaderboard = this.rebuildLeaderboard()
@@ -508,10 +474,6 @@ export class Race {
 	}
 
 	update() {
-		const racerEndpoint = this.swrc.wsInterface.getPath(
-			"/racer"
-		) as RacerEndpoint
-
 		this.lap_begin_times = []
 
 		this.racers.forEach((racer) => {
@@ -542,10 +504,10 @@ export class Race {
 			lap_map[racer.name] = racer.lap
 		})
 
-		racerEndpoint?.clients.forEach((client) => {
-			racerEndpoint.sendPacket(
+		this.session.racer_endpoint.clients.forEach((client) => {
+			this.session.racer_endpoint.sendPacket(
 				client as AuthWebsocket,
-				RacerPacket.UPDATE,
+				Packets.UPDATE,
 				{
 					racers: this.racers.map((racer) => racer.name),
 					race_lap_begin: this.lap_begin_times,

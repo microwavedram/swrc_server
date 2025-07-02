@@ -2,29 +2,13 @@ import type { IncomingMessage } from "http"
 import { WebsocketEndpoint } from "../util/WebsocketEndpoint"
 import { parse } from "url"
 import log from "npmlog"
-import { APIScope } from "../util/KeyManager"
+import { Key, KeyScope } from "../util/Key"
 import type { AuthWebsocket } from "../util/Websocket"
 import type { RaceState, SpeedTrapResult } from "../Race"
 import { semverToInt } from "../util/Ver"
-import { MIN_VER } from ".."
+import { Session } from ".."
+import { PROTOCOL, Packets } from "../Protocol"
 import config from "../../config.toml"
-import { RacerPacket, type RacerEndpoint } from "./Racer"
-
-export const enum RCPacket {
-	HELLO = 0x00,
-	HANDSHAKE = 0x01,
-	LINECROSS = 0x02,
-	PUSHTRACK = 0x03,
-	MODIFYRACERS = 0x06,
-	MESSAGE = 0x07,
-	PITCROSS = 0x08,
-	RACESTATE = 0x09,
-	PITENTER = 0x10,
-	ENDRACE = 0x11,
-	SPEEDTRAP = 0x12,
-	DEBUGEVAL = 0x13,
-	TIMER = 0x14,
-}
 
 export const enum ModifyRacerPacketAction {
 	ADD = "ADD",
@@ -93,49 +77,65 @@ export interface DebugEval {
 	payload: string
 }
 
-export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
+export class RCEndpoint extends WebsocketEndpoint<Packets> {
+	session: Session
+
+	constructor(session: Session) {
+		super()
+
+		this.session = session
+	}
+
 	async auth(request: IncomingMessage): Promise<boolean> {
-		const { api_key } = parse(request.url as string, true).query
+		const { auth } = parse(request.url as string, true).query
 
-		if (api_key == undefined) return false
+		if (auth == undefined) return false
 
-		const key_info = this.swrc.sqlite.getApiKey(api_key as string)
+		const key = Key.parseKey(auth as string)
 
-		if (key_info != null) {
-			if (key_info.scopes.includes(APIScope.RC)) {
-				return true
-			}
-		}
+		if (key.isErr()) return false
 
-		return false
+		const validKey = (
+			await this.session.swrc.sqlite.validateKey(key.value)
+		).unwrapOr(false)
+
+		if (!validKey) return false
+
+		if (key.value.scopes.has(KeyScope.ADMINISTRATOR)) return true
+
+		return (
+			key.value.scopes.has(KeyScope.RC) &&
+			this.session.key != null &&
+			this.session.key.equals(key.value)
+		)
 	}
 
 	onConnection(client: AuthWebsocket): void {
-		this.sendPacket(client, RCPacket.HELLO, {})
+		this.sendPacket(client, Packets.HELLO, {})
 	}
 
-	onMessage(client: AuthWebsocket, packetType: RCPacket, data: Buffer): void {
+	onMessage(client: AuthWebsocket, packetType: Packets, data: Buffer): void {
 		log.verbose("RC", packetType, data.toString())
 
-		if (!client.authenticated && packetType != RCPacket.HANDSHAKE) return
+		if (!client.rc$authenticated && packetType != Packets.HANDSHAKE) return
 
 		switch (packetType) {
-			case RCPacket.HANDSHAKE:
+			case Packets.HANDSHAKE:
 				const { username, uuid, version } = JSON.parse(data.toString())
 
 				if (!username || !uuid || !version) {
 					return
 				}
 
-				if (semverToInt(version) < MIN_VER) {
+				if (semverToInt(version) < PROTOCOL) {
 					log.warn(
 						"RC",
 						`Kicking ${username} due to outdated ${semverToInt(
 							version
-						)} < ${MIN_VER}`
+						)} < ${PROTOCOL}`
 					)
-					this.sendPacket(client, RCPacket.MESSAGE, {
-						message: `Your mod version is out of date, minimum required is ${MIN_VER}`,
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Your mod version is out of date, minimum required is ${PROTOCOL}`,
 					})
 					client.close(3000)
 					return
@@ -147,7 +147,7 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 					version,
 				}
 
-				client.authenticated = true
+				client.rc$authenticated = true
 
 				log.info(
 					"RACER",
@@ -156,18 +156,20 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 					)}`
 				)
 
-				this.sendPacket(client, RCPacket.HANDSHAKE, {})
+				this.sendPacket(client, Packets.HANDSHAKE, {
+					motd: config.motd.rc,
+				})
 
 				break
-			case RCPacket.LINECROSS:
+			case Packets.LINECROSS:
 				const linecrosses = JSON.parse(data.toString()) as LineCrosses
 
-				if (this.swrc.current_race) {
+				if (this.session.race) {
 					for (const [checkpoint_id, players] of Object.entries(
 						linecrosses.checkpoint_crosses
 					)) {
 						players.forEach((player) => {
-							this.swrc.current_race?.handleLineCross(
+							this.session.race?.handleLineCross(
 								player,
 								linecrosses.timestamp,
 								parseInt(checkpoint_id)
@@ -182,35 +184,33 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 				}
 
 				break
-			case RCPacket.PUSHTRACK:
+			case Packets.PUSHTRACK:
 				const trackPush: PushTrackPacket = JSON.parse(
 					data.toString()
 				) as PushTrackPacket
 
-				if (this.swrc.current_race == null) {
-					this.swrc.newRace(trackPush)
+				if (this.session.race == null) {
+					this.session.newRace(trackPush)
 				} else {
-					this.sendPacket(client, RCPacket.MESSAGE, {
+					this.sendPacket(client, Packets.MESSAGE, {
 						message:
 							"Failed to start new race due to currently active race.",
 					})
 				}
 
 				break
-			case RCPacket.MODIFYRACERS:
+			case Packets.MODIFYRACERS:
 				const modifyRacer: ModifyRacerPacket = JSON.parse(
 					data.toString()
 				) as ModifyRacerPacket
 
-				if (this.swrc.current_race != null) {
+				if (this.session.race) {
 					switch (modifyRacer.action) {
 						case ModifyRacerPacketAction.ADD:
-							this.swrc.current_race.addPlayer(
-								modifyRacer.racer_name
-							)
+							this.session.race?.addPlayer(modifyRacer.racer_name)
 							break
 						case ModifyRacerPacketAction.REMOVE:
-							this.swrc.current_race.removePlayer(
+							this.session.race?.removePlayer(
 								modifyRacer.racer_name
 							)
 							break
@@ -222,19 +222,19 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 							break
 					}
 				} else {
-					this.sendPacket(client, RCPacket.MESSAGE, {
+					this.sendPacket(client, Packets.MESSAGE, {
 						message:
 							"Failed to modify racers due to no current active race",
 					})
 				}
 
 				break
-			case RCPacket.PITCROSS:
+			case Packets.PITCROSS:
 				const pitcrosses = JSON.parse(data.toString()) as PitCrosses
 
-				if (this.swrc.current_race) {
+				if (this.session.race) {
 					pitcrosses.pit_crosses.forEach((name) => {
-						this.swrc.current_race?.handlePitCross(
+						this.session.race?.handlePitCross(
 							name,
 							pitcrosses.timestamp
 						)
@@ -247,14 +247,14 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 				}
 
 				break
-			case RCPacket.PITENTER:
+			case Packets.PITENTER:
 				const pitEnterCrosses = JSON.parse(
 					data.toString()
 				) as PitEnterCrosses
 
-				if (this.swrc.current_race) {
+				if (this.session.race) {
 					pitEnterCrosses.pit_enter_crosses.forEach((name) => {
-						this.swrc.current_race?.handlePitEnter(
+						this.session.race?.handlePitEnter(
 							name,
 							pitEnterCrosses.timestamp
 						)
@@ -267,87 +267,40 @@ export class RCEndpoint extends WebsocketEndpoint<RCPacket> {
 				}
 
 				break
-			case RCPacket.RACESTATE:
+			case Packets.RACESTATE:
 				const racestate = JSON.parse(data.toString()) as RaceStatePacket
 
-				if (this.swrc.current_race) {
-					this.swrc.current_race.setState(racestate.state)
+				if (this.session.race) {
+					this.session.race.setState(racestate.state)
 				}
 
 				break
-			case RCPacket.ENDRACE:
-				if (this.swrc.current_race) {
-					this.swrc.endRace()
+			case Packets.ENDRACE:
+				if (this.session.race) {
+					this.session.endRace()
 				}
 
 				break
-			case RCPacket.SPEEDTRAP:
+			case Packets.SPEEDTRAP:
 				const speedTrap = JSON.parse(data.toString()) as SpeedTrapPacket
 
-				if (this.swrc.current_race) {
+				if (this.session.race) {
 					log.verbose("RC", speedTrap)
 				}
 
 				break
 
-			case RCPacket.DEBUGEVAL:
-				const debugEval = JSON.parse(data.toString()) as DebugEval
-
-				if (client.handshake) {
-					if (
-						config.eval_users.includes(client.handshake.username) ||
-						client.remoteAddress == "::ffff:127.0.0.1"
-					) {
-						const fn = new Function("swrc", debugEval.payload)
-
-						try {
-							const result = fn(this.swrc)
-
-							this.sendPacket(client, RCPacket.MESSAGE, {
-								message: JSON.stringify(result),
-							})
-						} catch (e) {
-							log.warn("EVAL", e)
-
-							const racerEndpoint = this.swrc.wsInterface.getPath(
-								"/racer"
-							) as RacerEndpoint
-
-							if (racerEndpoint) {
-								racerEndpoint.clients.forEach((c) => {
-									if (
-										(c as AuthWebsocket).handshake
-											?.username ==
-										client.handshake?.username
-									) {
-										racerEndpoint.sendPacket(
-											client as AuthWebsocket,
-											RacerPacket.MESSAGE,
-											{
-												message: `${e}`,
-											}
-										)
-									}
-								})
-							}
-						}
-					} else {
-						log.warn(
-							"EVAL",
-							`${client?.handshake?.username} failed eval auth`
-						)
-					}
-				}
+			case Packets.DEBUGEVAL:
+				log.error("EVAL", "NOT IMPLEMENTED AS OF 3.0")
 
 				break
-			case RCPacket.TIMER:
+			case Packets.TIMER:
 				const timer = JSON.parse(data.toString()) as TimerPacket
 
-				if (this.swrc.current_race) {
-					this.swrc.current_race.timer_start = timer.start_time
-					this.swrc.current_race.timer_duration = timer.duration
+				if (this.session.race) {
+					this.session.race.timer_start = timer.start_time
+					this.session.race.timer_duration = timer.duration
 				}
-				log.warn("RC", `ÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ`)
 
 				break
 

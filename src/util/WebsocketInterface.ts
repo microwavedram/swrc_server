@@ -23,6 +23,10 @@ export class WebsocketInterface {
 		websocketEndpoint.init()
 	}
 
+	removePath(path: string) {
+		delete this.paths[path]
+	}
+
 	getPath(path: string): WebsocketEndpoint<any> | null {
 		return this.paths[path]
 	}
@@ -30,12 +34,13 @@ export class WebsocketInterface {
 	#auth(request: IncomingMessage): boolean {
 		if (!request.url) return false
 
-		const { token } = parse(request.url, true).query
+		const { head } = parse(request.url, true).query
 
+		// dont ask.
 		if (
-			token === getHeadToken(new Date().getDate()) ||
-			token === getHeadToken(new Date().getDate() - 1) ||
-			token === getHeadToken(new Date().getDate() + 1)
+			head === getHeadToken(new Date().getDate()) ||
+			head === getHeadToken(new Date().getDate() - 1) ||
+			head === getHeadToken(new Date().getDate() + 1)
 		) {
 			return true
 		}

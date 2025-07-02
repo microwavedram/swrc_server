@@ -2,17 +2,13 @@ import log from "npmlog"
 import { WebSocketServer, type RawData } from "ws"
 import { IncomingMessage } from "http"
 import { AuthWebsocket } from "./Websocket"
-import type { SWRC } from ".."
+import type { SWRC, Session } from ".."
 
 export abstract class WebsocketEndpoint<Protocol> extends WebSocketServer {
-	swrc: SWRC
-
-	constructor(swrc: SWRC) {
+	constructor() {
 		super({
 			noServer: true,
 		})
-
-		this.swrc = swrc
 	}
 
 	async auth(request: IncomingMessage): Promise<boolean> {
@@ -21,6 +17,12 @@ export abstract class WebsocketEndpoint<Protocol> extends WebSocketServer {
 
 	onMessage(client: WebSocket, packetType: Protocol, data: Buffer): void {}
 	onConnection(client: AuthWebsocket): void {}
+
+	async sendAllPacket(packetType: Protocol, data: any) {
+		this.clients.forEach((client) =>
+			this.sendPacket(client as AuthWebsocket, packetType, data)
+		)
+	}
 
 	async sendPacket(
 		client: AuthWebsocket,

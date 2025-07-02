@@ -1,0 +1,63 @@
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+body {
+  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1a1a1a);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  font-family: 'Segoe UI', sans-serif;
+  color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+.container {
+  max-width: 600px;
+  margin: 80px auto;
+  background: rgba(20, 20, 20, 0.85);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.7);
+  text-align: center;
+}
+
+h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+  color: #00bcd4;
+}
+
+.ok {
+  color: #4caf50;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  background-color: #4caf50;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 5px #4caf50, 0 0 10px #4caf50;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

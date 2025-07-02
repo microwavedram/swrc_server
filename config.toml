@@ -1,8 +1,24 @@
-update_speed = 250
-checkpoint_reset_speed = 5000
-port = 7777
-eval_users = ["localhackerman"]
+server_label = "SWRC Primary"
+default_organisation = "FA"
 
+# Internal update speed
+update_speed = 250
+
+# Attempted fix to multi-rc ithrun s1 situation
+checkpoint_reset_speed = 5000
+
+# Primary websocket's port
+port = 7777
+
+# Maximum session for RC
+max_sessions_per = 1
+
+[motd]
+rc = "Remember to set race state!"
+racer = "One must hope for >10tps"
+swrc = ":wave:"
+
+# Webserver configuration
 [express]
 enabled = true
 port = 2145

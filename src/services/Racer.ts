@@ -1,59 +1,57 @@
 import type { IncomingMessage } from "http"
 import { WebsocketEndpoint } from "../util/WebsocketEndpoint"
 import { parse } from "url"
-import { APIScope } from "../util/KeyManager"
+import { KeyScope } from "../util/Key"
 
 import log from "npmlog"
 import type { AuthWebsocket } from "../util/Websocket"
 import type { PushTrackPacket } from "./RC"
 import { semverToInt } from "../util/Ver"
-import { MIN_VER } from ".."
+import { Session } from ".."
+import { PROTOCOL, Packets } from "../Protocol"
 
-export const enum RacerPacket {
-	HELLO = 0x00,
-	HANDSHAKE = 0x01,
-	NEWRACE = 0x04,
-	UPDATE = 0x05,
-	MESSAGE = 0x07,
-	RACESTATE = 0x09,
-	ENDRACE = 0x11,
-}
+import config from "../../config.toml"
 
-export class RacerEndpoint extends WebsocketEndpoint<RacerPacket> {
+export class RacerEndpoint extends WebsocketEndpoint<Packets> {
+	session: Session
+
+	constructor(session: Session) {
+		super()
+
+		this.session = session
+	}
+
 	async auth(request: IncomingMessage): Promise<boolean> {
 		return true
 	}
 
 	onConnection(client: AuthWebsocket): void {
-		this.sendPacket(client, RacerPacket.HELLO, {})
+		this.sendPacket(client, Packets.HELLO, {})
 	}
 
-	onMessage(
-		client: AuthWebsocket,
-		packetType: RacerPacket,
-		data: Buffer
-	): void {
+	onMessage(client: AuthWebsocket, packetType: Packets, data: Buffer): void {
 		log.verbose("RACER", packetType, data.toString())
 
-		if (!client.authenticated && packetType != RacerPacket.HANDSHAKE) return
+		if (!client.racer$authenticated && packetType != Packets.HANDSHAKE)
+			return
 
 		switch (packetType) {
-			case RacerPacket.HANDSHAKE:
+			case Packets.HANDSHAKE:
 				let { username, uuid, version } = JSON.parse(data.toString())
 
 				if (!username || !uuid || !version) {
 					return
 				}
 
-				if (semverToInt(version) < MIN_VER) {
+				if (semverToInt(version) < PROTOCOL) {
 					log.warn(
 						"RACER",
 						`Kicking ${username} due to outdated ${semverToInt(
 							version
-						)} < ${MIN_VER}`
+						)} < ${PROTOCOL}`
 					)
-					this.sendPacket(client, RacerPacket.MESSAGE, {
-						message: `Your mod version is out of date, minimum required is ${MIN_VER}`,
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Your mod version is out of date, minimum required is ${PROTOCOL}`,
 					})
 					client.close(3000)
 					return
@@ -65,9 +63,11 @@ export class RacerEndpoint extends WebsocketEndpoint<RacerPacket> {
 					version,
 				}
 
-				client.authenticated = true
+				client.racer$authenticated = true
 
-				this.sendPacket(client, RacerPacket.HANDSHAKE, {})
+				this.sendPacket(client, Packets.HANDSHAKE, {
+					motd: config.motd.racer,
+				})
 
 				log.info(
 					"RACER",
@@ -76,15 +76,11 @@ export class RacerEndpoint extends WebsocketEndpoint<RacerPacket> {
 					)}`
 				)
 
-				if (this.swrc.current_race) {
-					this.sendPacket(
-						client as AuthWebsocket,
-						RacerPacket.NEWRACE,
-						{
-							race_id: this.swrc.current_race.id,
-							track: this.swrc.current_race.track,
-						} as PushTrackPacket
-					)
+				if (this.session.race) {
+					this.sendPacket(client as AuthWebsocket, Packets.NEWRACE, {
+						race_id: this.session.race.id,
+						track: this.session.race.track,
+					} as PushTrackPacket)
 				}
 
 				break

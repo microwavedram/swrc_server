@@ -14,6 +14,7 @@
     "@types/npmlog": "^7.0.0",
     "express": "^5.1.0",
     "express-basic-auth": "^1.2.1",
+    "neverthrow": "^8.2.0",
     "npmlog-file": "^0.1.4"
   }
 }
