@@ -90,12 +90,17 @@ export class Race {
 	timer_start: number = -1
 	timer_duration: number = -1
 
+	total_laps: number
+	total_pits: number
+
 	_raceStream: WriteStream
 
 	constructor(session: Session, raceData: PushTrackPacket) {
 		this.session = session
 		this.id = raceData.race_id
 		this.track = raceData.track
+		this.total_laps = raceData.total_laps
+		this.total_pits = raceData.total_pits
 
 		this._raceStream = createWriteStream(`./races/${this.id}.race`)
 	}
@@ -222,6 +227,12 @@ export class Race {
 					}
 				}
 
+				if (
+					racer.lap >= this.total_laps &&
+					this.state == RaceState.RACE
+				)
+					return
+
 				let lap_time = -1
 
 				if (last_lap != null) {
@@ -252,6 +263,11 @@ export class Race {
 		const racer = this.getRacerByName(racer_name)
 
 		if (racer) {
+			if (racer.lap >= this.total_laps && this.state == RaceState.RACE)
+				return
+			if (racer.pit >= this.total_pits && this.state == RaceState.RACE)
+				return
+
 			racer.pit += 1
 			racer.pit_splits.push({ checkpoint_index: 0, timestamp })
 
@@ -275,6 +291,11 @@ export class Race {
 		const racer = this.getRacerByName(racer_name)
 
 		if (racer) {
+			if (racer.lap >= this.total_laps && this.state == RaceState.RACE)
+				return
+			if (racer.pit >= this.total_pits && this.state == RaceState.RACE)
+				return
+
 			racer.pit_splits.push({ checkpoint_index: 1, timestamp })
 
 			this._raceStream.write(`${Date.now()} PIT_ENTER ${racer.name}\n`)

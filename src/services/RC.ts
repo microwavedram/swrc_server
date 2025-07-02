@@ -46,6 +46,8 @@ export interface PitEnterCrosses {
 export interface PushTrackPacket {
 	race_id: string
 	track: Track
+	total_laps: number
+	total_pits: number
 }
 
 export interface ModifyRacerPacket {
