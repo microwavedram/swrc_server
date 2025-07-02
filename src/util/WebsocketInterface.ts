@@ -75,6 +75,8 @@ export class WebsocketInterface {
 			try {
 				const { pathname } = new URL(request.url, "ws://undefined")
 
+				log.verbose("WSI", `upgrade from ${pathname}`)
+
 				if (pathname in this.paths) {
 					const endpoint = this.paths[pathname]
 

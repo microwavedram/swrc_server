@@ -191,6 +191,8 @@ export class SWRC {
 
 		this.express.enable("trust proxy")
 
+		console.log(getHeadToken(2))
+
 		this.express.use((req, res, next) => {
 			if (req.headers["x-forwarded-proto"] !== "https") {
 				return res.redirect(`https://${req.headers.host}${req.url}`)
