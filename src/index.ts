@@ -79,6 +79,10 @@ export class SWRC {
 
 	express = express()
 
+	isRaceIdTaken(id: string) {
+		return fs.existsSync(`./races/${id}.race`)
+	}
+
 	constructor() {
 		const writeStream = fs.createWriteStream("swrc.log")
 
@@ -117,6 +121,10 @@ export class SWRC {
 				.then((key) => {
 					log.info("SWRC", "Administrator key: " + key.toKeyString())
 				})
+		}
+
+		if (!fs.existsSync("./races")) {
+			fs.mkdirSync("./races")
 		}
 
 		if (process.argv[2] == "--keygen") {

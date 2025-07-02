@@ -189,6 +189,14 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 					data.toString()
 				) as PushTrackPacket
 
+				if (this.session.swrc.isRaceIdTaken(trackPush.race_id)) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message:
+							"Failed to start new race as the id is already taken",
+					})
+					return
+				}
+
 				if (this.session.race == null) {
 					this.session.newRace(trackPush)
 				} else {

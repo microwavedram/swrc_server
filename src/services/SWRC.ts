@@ -20,6 +20,11 @@ export interface NewSessionPacket {
 	race_key: string
 }
 
+export interface DestroySessionPacket {
+	session: string
+	key: string
+}
+
 export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 	swrc: SWRC
 
@@ -172,6 +177,55 @@ export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 				} as NewSessionPacket)
 
 				break
+			case Packets.ENDSESSION:
+				let end_session_packet = JSON.parse(
+					data.toString()
+				) as DestroySessionPacket
+
+				if (!this.validToken(end_session_packet.key)) return
+
+				const key2 = Key.parseKey(end_session_packet.key)
+				if (key2.isErr()) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Invalid key`,
+					})
+					return
+				}
+
+				const valid2 = await this.swrc.sqlite.validateKey(key2.value)
+
+				if (valid2.isErr() || valid2.value == false) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Invalid key`,
+					})
+					return
+				}
+
+				if (!key2.value.scopes.has(KeyScope.SESSION)) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Unauthorized`,
+					})
+					return
+				}
+
+				const session2 = this.swrc.sessions[end_session_packet.session]
+
+				if (
+					!session2.owning_key.equals(key2.value) &&
+					!key2.value.scopes.has(KeyScope.ADMINISTRATOR)
+				) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Not your session`,
+					})
+					return
+				}
+
+				session2.endRace()
+				session2.racer_endpoint.close()
+				session2.rc_endpoint.close()
+
+				delete this.swrc.sessions[end_session_packet.session]
+
 			default:
 				log.warn("SERVER", `Unknown packetId ${packetType}`)
 				break

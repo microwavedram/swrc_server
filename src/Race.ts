@@ -5,7 +5,6 @@ import { createWriteStream, WriteStream } from "fs"
 
 import type { PushTrackPacket, RCEndpoint, Track } from "./services/RC"
 import type { Session, SWRC } from "."
-import { RacerEndpoint } from "./services/Racer"
 import type { AuthWebsocket } from "./util/Websocket"
 import { Packets } from "./Protocol"
 
@@ -25,6 +24,14 @@ export class Racer {
 	constructor(name: string) {
 		this.name = name
 	}
+}
+
+export const enum Contribution {
+	NONE = "NONE",
+	OBSERVING = "OBSERVING",
+	OBSERVING_FULL = "OBSERVING_FULL",
+	PROVIDING = "PROVIDING",
+	PROVIDING_TRUSTED = "PROVIDING_TRUSTED",
 }
 
 export const enum RaceState {
@@ -75,6 +82,8 @@ export class Race {
 	state: RaceState = RaceState.NONE
 
 	flap_stack: Flap[] = []
+
+	contributers: { [name: string]: Contribution } = {}
 
 	race_leaderboard: RaceLeaderboardObject[] = []
 	lap_begin_times: PlayerSplit[] = []
@@ -495,12 +504,10 @@ export class Race {
 		})
 
 		const pit_map: { [name: string]: number } = {}
+		const lap_map: { [name: string]: number } = {}
+
 		this.racers.forEach((racer) => {
 			pit_map[racer.name] = racer.pit
-		})
-
-		const lap_map: { [name: string]: number } = {}
-		this.racers.forEach((racer) => {
 			lap_map[racer.name] = racer.lap
 		})
 
@@ -514,6 +521,7 @@ export class Race {
 					race_leaderboard: this.race_leaderboard,
 					racer_pits: pit_map,
 					racer_laps: lap_map,
+					racer_contribution: this.contributers,
 					flap: this.flap_stack[this.flap_stack.length - 1],
 					timer_start: this.timer_start,
 					timer_duration: this.timer_duration,
