@@ -227,10 +227,7 @@ export class Race {
 					}
 				}
 
-				if (
-					racer.lap >= this.total_laps &&
-					this.state == RaceState.RACE
-				)
+				if (racer.lap > this.total_laps && this.state == RaceState.RACE)
 					return
 
 				let lap_time = -1
