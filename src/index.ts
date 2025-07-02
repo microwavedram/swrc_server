@@ -189,7 +189,15 @@ export class SWRC {
 			})
 		})
 
-		this.express.set("trust proxy", true)
+		this.express.enable("trust proxy")
+
+		this.express.use((req, res, next) => {
+			if (req.headers["x-forwarded-proto"] !== "https") {
+				return res.redirect(`https://${req.headers.host}${req.url}`)
+			}
+			next()
+		})
+
 		this.express.use("/", express.static("public"))
 		this.express.get("/", (request, response) => {
 			response.send(`
