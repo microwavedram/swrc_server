@@ -189,6 +189,7 @@ export class SWRC {
 			})
 		})
 
+		this.express.set("trust proxy", true)
 		this.express.use("/", express.static("public"))
 		this.express.get("/", (request, response) => {
 			response.send(`
