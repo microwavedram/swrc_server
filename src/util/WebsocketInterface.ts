@@ -63,6 +63,7 @@ export class WebsocketInterface {
 			}
 
 			const authed = this.#auth(request)
+			log.verbose("WSI", `authenticated head ${request.url}`)
 
 			if (!authed) {
 				socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n")
