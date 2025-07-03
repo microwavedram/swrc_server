@@ -36,7 +36,7 @@ export const enum Contribution {
 
 export const enum RaceState {
 	NONE = "NONE",
-	QUAL = "QUALI",
+	QUALI = "QUALI",
 	RACE = "RACE",
 }
 
@@ -342,7 +342,7 @@ export class Race {
 	rebuildLeaderboard(): RaceLeaderboardObject[] {
 		let leaderboard: RaceLeaderboardObject[] = []
 
-		if (this.state == RaceState.QUAL) {
+		if (this.state == RaceState.QUALI) {
 			let flaps: {
 				racer: Racer
 				time: number
@@ -355,7 +355,14 @@ export class Race {
 				})
 			})
 
-			flaps.sort((a, b) => a.time - b.time)
+			flaps.sort((a, b) => {
+				if (a.time === b.time) return 0
+
+				if (a.time === -1) return 1
+				if (b.time === -1) return -1
+
+				return a.time - b.time
+			})
 
 			const first_place_flap = flaps[0].time
 
