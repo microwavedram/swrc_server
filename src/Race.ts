@@ -165,26 +165,36 @@ export class Race {
 
 		this.session.racer_endpoint.clients.forEach((client) => {
 			if ((client as AuthWebsocket).handshake?.username == racer.name) {
+				let prefix = "§e="
+
+				if (delta > 0) prefix = "§c+"
+				if (delta < 0) prefix = "§a-"
+
 				this.session.racer_endpoint.sendPacket(
 					client as AuthWebsocket,
 					Packets.MESSAGE,
 					{
-						message: `You have completed a lap in §2${
+						message: `§6You§r have completed a lap in §6${
 							lap_time / 1000
-						} ${delta / 1000}`,
+						} ${prefix}${delta / 1000}`,
 					}
 				)
 			}
 		})
 
 		this.session.rc_endpoint.clients.forEach((client) => {
+			let prefix = "§e="
+
+			if (delta > 0) prefix = "§c+"
+			if (delta < 0) prefix = "§a-"
+
 			this.session.racer_endpoint.sendPacket(
 				client as AuthWebsocket,
 				Packets.MESSAGE,
 				{
-					message: `${racer.name} have completed a lap in §2${
+					message: `§6${racer.name}§r has completed a lap in §2${
 						lap_time / 1000
-					} ${delta / 1000}`,
+					} ${prefix}${delta / 1000}`,
 				}
 			)
 		})
