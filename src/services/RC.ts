@@ -152,7 +152,7 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 				client.rc$authenticated = true
 
 				log.info(
-					"RACER",
+					"RC",
 					`${username} connected on ${version} ${semverToInt(
 						version
 					)}`

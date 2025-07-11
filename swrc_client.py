@@ -56,6 +56,12 @@ async def hello():
                break
         
         print("Connected to " + server_label)
+
+
+        if len(sessions) == 0:
+            print("No active sessions, come back later")
+            exit(0)
+
         print("Please select a session")
         for i, session in enumerate(sessions):
             print(f"[{i}] {session}")

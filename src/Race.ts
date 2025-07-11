@@ -186,7 +186,7 @@ export class Race {
 			let prefix = "§e="
 
 			if (delta > 0) prefix = "§c+"
-			if (delta < 0) prefix = "§a-"
+			if (delta < 0) prefix = "§a"
 
 			this.session.racer_endpoint.sendPacket(
 				client as AuthWebsocket,
@@ -270,7 +270,7 @@ export class Race {
 		const racer = this.getRacerByName(racer_name)
 
 		if (racer) {
-			if (racer.lap >= this.total_laps && this.state == RaceState.RACE)
+			if (racer.lap > this.total_laps && this.state == RaceState.RACE)
 				return
 			if (racer.pit >= this.total_pits && this.state == RaceState.RACE)
 				return
