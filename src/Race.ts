@@ -168,7 +168,7 @@ export class Race {
 				let prefix = "§e="
 
 				if (delta > 0) prefix = "§c+"
-				if (delta < 0) prefix = "§a-"
+				if (delta < 0) prefix = "§a"
 
 				this.session.racer_endpoint.sendPacket(
 					client as AuthWebsocket,
