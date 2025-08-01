@@ -278,7 +278,7 @@ export class Race {
 			racer.pit += 1
 			racer.pit_splits.push({ checkpoint_index: 0, timestamp })
 
-			this._raceStream.write(`${Date.now()} PIT ${racer.name}\n`)
+			this._raceStream.write(`${timestamp} PIT ${racer.name}\n`)
 
 			this.session.racer_endpoint.clients.forEach((client) => {
 				this.session.racer_endpoint.sendPacket(
@@ -305,7 +305,7 @@ export class Race {
 
 			racer.pit_splits.push({ checkpoint_index: 1, timestamp })
 
-			this._raceStream.write(`${Date.now()} PIT_ENTER ${racer.name}\n`)
+			this._raceStream.write(`${timestamp} PIT_ENTER ${racer.name}\n`)
 
 			this.session.racer_endpoint.clients.forEach((client) => {
 				this.session.racer_endpoint.sendPacket(
