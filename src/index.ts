@@ -44,6 +44,9 @@ export class Session {
 	}
 
 	update() {
+		this.racer_endpoint.sendAllPacket(Packets.HEARTBEAT, {})
+		this.rc_endpoint.sendAllPacket(Packets.HEARTBEAT, {})
+
 		if (this.race) {
 			const begin = performance.now()
 			this.race.update()

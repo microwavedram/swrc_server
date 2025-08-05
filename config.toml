@@ -1,4 +1,4 @@
-server_label = "SWRC Primary"
+server_label = "SWRC Local Test Server"
 default_organisation = "FA"
 
 # Internal update speed

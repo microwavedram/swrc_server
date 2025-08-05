@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ race_name }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <style>
+        :root {
+            --background-color: #252627;
+            --background-seccondary: #424344;
+            --primary-color: #fff;
+            --accent: #f5f567;
+        }
+
+        html {
+            font-family: "JetBrains Mono", serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        p {
+            margin: 0
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table > tr > th, td {
+            border: 1px solid var(--background-seccondary);
+            padding: 0.1em;
+        }
+
+        h1 {
+            margin: 0;
+            padding: 0;
+        }
+
+        .time {
+            text-align: right;
+        }
+
+        .tr_alt_1 {
+            background-color: #1a1b1c;
+        }
+
+        .tr_alt_2 {
+            background-color: #1d1e1e;
+        }
+
+        .inset {
+            margin: 0.5em;
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+
+            background-color: var(--background-color);
+            border: 1px solid var(--background-seccondary);
+            color: #fff;
+            text-align: center;
+            position: absolute;
+            width: calc(200% + 3px);
+            top: 100%;
+            left: 0%;
+            transform: translateX(-25% - 1px);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .pit_last {
+            position: relative;
+            padding-right: 0.5em;
+        }
+
+        .pit_last::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 0.2em;
+            background-color: var(--accent);
+        }
+    </style>
+
+    <div class="header inset">
+        <h1>{{ race_name }}</h1>
+    </div>
+
+    <hr>
+
+    <table id="table">
+        <tr>
+            <th>Pos</th>
+            <th>Name</th>
+            {% for x in range(laps) %}
+                <th>Lap {{ x + 1 }}</th>
+            {% endfor %}
+            <th>Flap</th>
+            <th>Average</th>
+            <th>Std.Dev</th>
+            <th>Finishing Gap</th>
+        </tr>
+        {% for pos, player in enumerate(finishing_order) %}
+            {% if pos % 2 == 0 %}
+                <tr class="tr_alt_1">
+            {% else %}
+                <tr class="tr_alt_2">
+            {% endif %}
+                <td>{{ pos + 1 }}</td>
+                <td>{{ player["player"] }}</td>
+                {% for lap, delta in enumerate(racer_lap_times[player["player"]]) %}
+                    {% if (lap + 2) in laps_pitted_on[player["player"]] %}
+                        <td class="tooltip time pit_last">
+                    {% else %}
+                        <td class="tooltip time">
+                    {% endif %}
+                        {% if delta == 0 %}
+                            -
+                        {% else %}
+                            {{ format_time(delta) }}
+                        {% endif %}
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                {% endfor %}
+                <td class="time">{{ format_time(min(racer_lap_times[player["player"]])) }}</td>
+                <td class="time">{{ format_time(int(sum(racer_lap_times[player["player"]]) / len(racer_lap_times[player["player"]]))) }}</td>
+                <td class="time">{{ int(std_dev(racer_lap_times[player["player"]]) / 100) / 10 }}</td>
+                {% if player["player"] in finishing_gap %}
+                    <td class="time">+{{ format_time(finishing_gap[player["player"]]) }}</td>
+                {% else %}
+                    <td class="time">-</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+
+    <script defer>
+        const table = document.getElementById("table")
+
+        const lookup = {
+            1: "gold",
+            2: "silver",
+            3: "#cd7f32",
+        }
+
+        for (let i = 0; i < table.children.item(0).children.length; i++) {
+            const element = table.children.item(0).children.item(i);
+
+            if (i in lookup) {
+                element.style.color = lookup[i]
+            }
+            
+        }
+    </script>
+    
+</body>
+</html>

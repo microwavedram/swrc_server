@@ -59,7 +59,7 @@ def validate_race(filename, max_checkpoint_index, lap_total):
             history = player_checkpoints[player]
             if history:
                 prev = history[-1]
-                if checkpoint < (prev[1] % max_checkpoint_index):
+                if max_checkpoint_index != 0 and checkpoint < (prev[1] % max_checkpoint_index):
                     print(f"[Line {line_no}] ❌ {player} regressed: {prev % max_checkpoint_index} → {checkpoint}")
                     errors += 1
             player_checkpoints[player].append(

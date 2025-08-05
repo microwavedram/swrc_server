@@ -128,9 +128,6 @@ def lap_data(crosses):
 
                     checkpoint_deltas = []
 
-                    # print(f"{player_name} completed lap {lap}")
-
-
                     highest_lap = max(highest_lap, lap)
                     if lap <= lap_total:
                         player_ref["laps"].append(timestamp)
