@@ -70,6 +70,7 @@ export class WebsocketInterface {
 				socket.destroy()
 
 				log.verbose("WSI", `Failed Authorization`)
+
 				return
 			}
 

@@ -2,7 +2,6 @@ import log from "npmlog"
 import { WebSocketServer, type RawData } from "ws"
 import { IncomingMessage } from "http"
 import { AuthWebsocket } from "./Websocket"
-import type { SWRC, Session } from ".."
 
 export abstract class WebsocketEndpoint<Protocol> extends WebSocketServer {
 	constructor() {
@@ -34,9 +33,9 @@ export abstract class WebsocketEndpoint<Protocol> extends WebSocketServer {
 		const packet = Buffer.alloc(payload.length + 1)
 
 		payload.copy(packet, 1)
-		packet.writeUInt8(packetType as number, 0)
+		packet.writeUint8(packetType as number, 0)
 
-		client.send(packet.toString())
+		client.send(packet)
 	}
 
 	#onConnection(

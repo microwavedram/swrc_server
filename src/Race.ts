@@ -20,6 +20,7 @@ export class Racer {
 	pit_splits: Split[] = []
 	splits: Split[] = []
 	traps: SpeedTrapResult[] = []
+	flap: null | Flap = null
 
 	constructor(name: string) {
 		this.name = name
@@ -50,6 +51,7 @@ export interface Flap {
 	lap: number
 	time: number
 	acquired: number
+	checkpoints: { [id: number]: number }
 }
 
 export interface SnapshotTime {
@@ -64,6 +66,7 @@ export interface RaceLeaderboardObject {
 	time_delta: number
 	in_pit: boolean
 	flap: number
+	lap_delta: number
 }
 export interface SpeedTrapResult {
 	player: string
@@ -131,6 +134,12 @@ export class Race {
 			`${flap.player_name} just aquired a new fastest lap ${flap.time} on lap ${flap.lap}`
 		)
 		this.flap_stack.push(flap)
+
+		const racer = this.getRacerByName(flap.player_name)
+
+		if (racer) {
+			racer.flap = flap
+		}
 	}
 
 	handleLap(racer: Racer, timestamp: number, lap: number, lap_time: number) {
@@ -145,6 +154,39 @@ export class Race {
 			`${Date.now()} META LAPTIME ${racer.name} ${lap_time}\n`
 		)
 
+		const checkpoints: { [id: number]: number } = {}
+
+		let i = racer.splits.length - 1
+		while (i >= 0) {
+			const split = racer.splits[i]
+
+			if (
+				!(
+					split.checkpoint_index % this.track.checkpoints.length in
+					checkpoints
+				)
+			) {
+				checkpoints[
+					split.checkpoint_index % this.track.checkpoints.length
+				] = split.timestamp
+			}
+
+			if (split.checkpoint_index % this.track.checkpoints.length == 0) {
+				break
+			}
+
+			i--
+		}
+
+		if (this.getFlap(racer) == -1 || this.getFlap(racer) > lap_time) {
+			racer.flap = {
+				player_name: racer.name,
+				lap: lap,
+				time: lap_time,
+				acquired: timestamp,
+				checkpoints: checkpoints,
+			}
+		}
 		if (
 			this.flap_stack.length == 0 ||
 			lap_time < this.flap_stack[this.flap_stack.length - 1].time
@@ -154,6 +196,7 @@ export class Race {
 				lap: lap,
 				time: lap_time,
 				acquired: timestamp,
+				checkpoints: checkpoints,
 			})
 		}
 
@@ -224,6 +267,9 @@ export class Race {
 				}
 			}
 
+			if (racer.lap > this.total_laps && this.state == RaceState.RACE)
+				return
+
 			if (checkpoint_index == 0) {
 				let last_lap = null
 
@@ -236,9 +282,6 @@ export class Race {
 						last_lap = racer.splits[i]
 					}
 				}
-
-				if (racer.lap > this.total_laps && this.state == RaceState.RACE)
-					return
 
 				let lap_time = -1
 
@@ -270,6 +313,8 @@ export class Race {
 		const racer = this.getRacerByName(racer_name)
 
 		if (racer) {
+			if (racer.splits.length == 0) return
+
 			if (racer.lap > this.total_laps && this.state == RaceState.RACE)
 				return
 			if (racer.pit >= this.total_pits && this.state == RaceState.RACE)
@@ -377,11 +422,76 @@ export class Race {
 			const first_place_flap = flaps[0].time
 
 			flaps.forEach((flap) => {
+				let lap_delta = 0
+
+				const latest_flap = flap.racer.flap
+
+				if (latest_flap != null) {
+					log.verbose("RACE", "updating flap lap deltas ")
+
+					const latest_split =
+						flap.racer.splits[flap.racer.splits.length - 1]
+
+					const lap_checkpoints: { [id: number]: number } = {}
+
+					let current_lap_begin_timestamp = 0
+
+					let i = flap.racer.splits.length - 1
+					while (i >= 0) {
+						const split = flap.racer.splits[i]
+
+						if (
+							!(
+								split.checkpoint_index %
+									this.track.checkpoints.length in
+								lap_checkpoints
+							)
+						) {
+							lap_checkpoints[
+								split.checkpoint_index %
+									this.track.checkpoints.length
+							] = split.timestamp
+						}
+
+						if (
+							split.checkpoint_index %
+								this.track.checkpoints.length ==
+							0
+						) {
+							current_lap_begin_timestamp = split.timestamp
+							break
+						}
+
+						i--
+					}
+
+					const latest_checkpoint =
+						latest_split.checkpoint_index %
+						this.track.checkpoints.length
+
+					for (let i = latest_checkpoint; i >= 0; i--) {
+						if (
+							i in lap_checkpoints &&
+							i in latest_flap.checkpoints
+						) {
+							const lap_time =
+								lap_checkpoints[i] - current_lap_begin_timestamp
+							const flap_time =
+								latest_flap.checkpoints[i] -
+								latest_flap.checkpoints[0]
+
+							lap_delta = lap_time - flap_time
+							break
+						}
+					}
+				}
+
 				leaderboard.push({
 					player_name: flap.racer.name,
 					time_delta: first_place_flap - flap.time,
 					in_pit: false,
 					flap: flap.time,
+					lap_delta: lap_delta,
 				})
 			})
 		} else {
@@ -475,6 +585,7 @@ export class Race {
 									split.timestamp,
 								in_pit,
 								flap,
+								lap_delta: 0,
 							})
 						})
 					} else {
@@ -507,6 +618,7 @@ export class Race {
 								time_delta: 0,
 								in_pit,
 								flap,
+								lap_delta: 0,
 							})
 						})
 					}
