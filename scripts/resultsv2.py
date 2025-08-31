@@ -24,7 +24,7 @@ def decode_content(content):
         events.append(data)
 
 
-    events.sort(key=lambda x: int(x[0]))
+    events.sort(key=lambda x: x[0])
 
     return events
 
@@ -65,8 +65,6 @@ def render_results(events, laps, pits = 0,race_name="undefined"):
 
                 pit_laps = laps_pitted_on.get(player, {})
 
-                print(player, "pitted on lap", lap)
-
                 if player in last_pit_enter_cache:
                     delta = timestamp - last_pit_enter_cache[player]
 
@@ -104,8 +102,10 @@ def render_results(events, laps, pits = 0,race_name="undefined"):
             continue
 
         if index == 0:
-            if timestamp - last_cp0_cache.get(player, 0) < 10000:
-                curr_lap = data["current_lap"]
+            lap_time = timestamp - last_cp0_cache.get(player, 0)
+            curr_lap = data["current_lap"]
+
+            if lap_time < 10000:
                 print(f"⚠️  Ignoring short lap {curr_lap} for {player}")
                 continue
 
@@ -230,10 +230,10 @@ def main():
     parser.add_argument("-l", "--laps", required=True, help="Total laps", type=int)
     parser.add_argument("-p", "--pits", default=0, help="Total pits", type=int)
     parser.add_argument("--insert-pit-laps", action="store_true" , help="Insert pit counts as lap checkpoints after the fact.")
+    parser.add_argument("--insert-pit-from-enter", help="saisho please", type=int)
+    parser.add_argument("--split-long-laps", default=None, help="fix missed start line checkpoints", type=int)
 
     args = parser.parse_args()
-
-    print(args)
 
     race_name = pathlib.Path(args.input).stem
 
@@ -244,6 +244,41 @@ def main():
     except Exception as e:
         print(f"Error reading file: {e}")
         return
+
+    if args.insert_pit_from_enter:
+
+        i = 0
+        while i < len(events):
+            event = events[i]
+
+            if event[1] == "PIT_ENTER":
+                player = event[2]
+
+                events.insert(i + 1, [
+                    event[0] + args.insert_pit_from_enter,
+                    "PIT",
+                    player
+                ])
+
+            i = i + 1
+
+        events.sort(key=lambda x: int(x[0]))
+
+        bad = []
+
+        last_pit_timestamp, last_pit_player = 0, ""
+        for i, event in enumerate(events):
+            if event[1] == "PIT":
+                if abs(event[0] - last_pit_timestamp) < 20000 and event[2] == last_pit_player:
+                    bad.append(i)
+
+                last_pit_timestamp, last_pit_player = event[0], event[2]
+
+        for ind in reversed(bad):
+            events.pop(ind)
+
+        events.sort(key=lambda x: int(x[0]))
+        
     
     if args.insert_pit_laps:
         i = 0
@@ -259,6 +294,32 @@ def main():
                     "0",
                     player
                 ])
+
+            i = i + 1
+
+    if args.split_long_laps:
+
+        cp0_cache = {}
+
+        i = 0
+        while i < len(events):
+            event = events[i]
+
+            if event[1] == "CHECKPOINT":
+                checkpoint_number = int(event[2])
+                player = event[3]
+
+                if checkpoint_number == 0:
+                    if player in cp0_cache:
+                        lap_time = event[0] - cp0_cache.get(player)
+
+                        if lap_time > args.split_long_laps:
+                            print(f"⚠️  {player} has long lap, splitting")
+                            events.insert(i - 1, [event[0] - lap_time // 2, "CHECKPOINT", "0", player])
+                            i = i + 1
+
+                
+                    cp0_cache[player] = event[0]
 
             i = i + 1
     
