@@ -1,4 +1,4 @@
-export const PROTOCOL = 300
+export const PROTOCOL = 310
 
 export const enum Packets {
 	/* $swrc */ HELLO = 0x00,
@@ -17,9 +17,13 @@ export const enum Packets {
 	/* $rc */ SPEEDTRAP = 0x12,
 	/* $rc */ DEBUGEVAL = 0x13,
 	/* $rc */ TIMER = 0x14,
+	/* $rc */ POP_FLAP = 0x15,
+	/* $rc */ REORDER = 0x16,
 
 	/* $swrc */ CREATENEWSESSION = 0x40,
 	/* $swrc */ NEWSESSION = 0x41,
 	/* $swrc */ ENDSESSION = 0x42,
 	/* $swrc */ SESSIONS = 0x4f,
+
+	/* $rc $racer */ HEARTBEAT = 0xff,
 }

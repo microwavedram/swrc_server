@@ -79,6 +79,12 @@ export interface DebugEval {
 	payload: string
 }
 
+export interface PopFlap {}
+
+export interface Reorder {
+	order: string[]
+}
+
 export class RCEndpoint extends WebsocketEndpoint<Packets> {
 	session: Session
 
@@ -313,7 +319,34 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 				}
 
 				break
+			case Packets.POP_FLAP:
+				const _pop_packet = JSON.parse(data.toString()) as PopFlap
 
+				if (this.session.race) {
+					this.session.race.flap_stack.pop()
+				}
+
+				break
+			case Packets.REORDER:
+				const reorder_packet = JSON.parse(data.toString()) as Reorder
+
+				const ordering: { [name: string]: number } = {}
+
+				for (let i = 0; i < reorder_packet.order.length; i++) {
+					const element = reorder_packet.order[i]
+
+					ordering[element] = i
+				}
+
+				if (this.session.race) {
+					this.session.race.racers.sort(
+						(a, b) => ordering[a.name] - ordering[b.name]
+					)
+					this.session.race.race_leaderboard =
+						this.session.race.rebuildLeaderboard()
+				}
+
+				break
 			default:
 				log.warn("RC", `Unknown packetId ${packetType}`)
 				break
