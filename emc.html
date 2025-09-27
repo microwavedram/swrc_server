@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F2PhillipinesGP2025</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <style>
+        :root {
+            --background-color: #252627;
+            --background-seccondary: #424344;
+            --primary-color: #fff;
+            --accent: #f5f567;
+        }
+
+        html {
+            font-family: "JetBrains Mono", serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        p {
+            margin: 0
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table > tr > th, td {
+            border: 1px solid var(--background-seccondary);
+            padding: 0.1em;
+        }
+
+        h1 {
+            margin: 0;
+            padding: 0;
+        }
+
+        .time {
+            text-align: right;
+        }
+
+        .tr_alt_1 {
+            background-color: #1a1b1c;
+        }
+
+        .tr_alt_2 {
+            background-color: #1d1e1e;
+        }
+
+        .inset {
+            margin: 0.5em;
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+
+            background-color: var(--background-color);
+            border: 1px solid var(--background-seccondary);
+            color: #fff;
+            text-align: center;
+            position: absolute;
+            width: calc(200% + 3px);
+            top: 100%;
+            left: 0%;
+            transform: translateX(-25% - 1px);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .pit_last {
+            position: relative;
+            padding-right: 0.5em;
+        }
+
+        .pit_last::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 0.2em;
+            background-color: var(--accent);
+        }
+    </style>
+
+    <div class="header inset">
+        <h1>F2PhillipinesGP2025</h1>
+    </div>
+
+    <hr>
+
+    <table id="table">
+        <tr>
+            <th>Pos</th>
+            <th>Name</th>
+            
+                <th>Lap 1</th>
+            
+                <th>Lap 2</th>
+            
+                <th>Lap 3</th>
+            
+                <th>Lap 4</th>
+            
+                <th>Lap 5</th>
+            
+                <th>Lap 6</th>
+            
+                <th>Lap 7</th>
+            
+                <th>Lap 8</th>
+            
+                <th>Lap 9</th>
+            
+                <th>Lap 10</th>
+            
+                <th>Lap 11</th>
+            
+                <th>Lap 12</th>
+            
+                <th>Lap 13</th>
+            
+                <th>Lap 14</th>
+            
+                <th>Lap 15</th>
+            
+                <th>Lap 16</th>
+            
+                <th>Lap 17</th>
+            
+            <th>Flap</th>
+            <th>Average</th>
+            <th>Std.Dev</th>
+            <th>Finishing Gap</th>
+        </tr>
+        
+            
+                <tr class="tr_alt_1">
+            
+                <td>1</td>
+                <td>HockeyMan_31</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:32.150
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:19.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:18.800
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:40.750
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:15.450
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:18.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:17.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:43.550
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:14.800
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:22.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:18.850
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:19.500
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:18.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:17.600
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">01:14.800</td>
+                <td class="time">01:22.350</td>
+                <td class="time">8.1</td>
+                
+                    <td class="time">+0.000</td>
+                
+            </tr>
+        
+            
+                <tr class="tr_alt_2">
+            
+                <td>2</td>
+                <td>anchoredtolife</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.800
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:19.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:23.550
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:17.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:26.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:49.400
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:40.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:15.000
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:17.900
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:18.950
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:18.050
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:16.950
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.500
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:18.850
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.900
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">01:15.000</td>
+                <td class="time">01:23.200</td>
+                <td class="time">8.5</td>
+                
+                    <td class="time">+13.800</td>
+                
+            </tr>
+        
+            
+                <tr class="tr_alt_1">
+            
+                <td>3</td>
+                <td>Czipsu35</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:30.550
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:22.900
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.750
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:17.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:44.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:17.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:54.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:15.450
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:18.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.350
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:29.600
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.050
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:19.050
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.400
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.350
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:17.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">01:15.450</td>
+                <td class="time">01:24.850</td>
+                <td class="time">9.9</td>
+                
+                    <td class="time">+28.400</td>
+                
+            </tr>
+        
+            
+                <tr class="tr_alt_2">
+            
+                <td>4</td>
+                <td>bluestar_10</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:28.950
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.150
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:19.400
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:44.000
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:17.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.400
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:22.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.450
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:44.350
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.500
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:22.150
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:25.950
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:22.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.500
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">01:17.700</td>
+                <td class="time">01:24.950</td>
+                <td class="time">7.4</td>
+                
+                    <td class="time">+2.350</td>
+                
+            </tr>
+        
+            
+                <tr class="tr_alt_1">
+            
+                <td>5</td>
+                <td>memestarr</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:34.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.600
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:25.950
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:23.000
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:22.800
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:26.150
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:42.450
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:16.850
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.550
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:52.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:19.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:25.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.600
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:24.350
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:21.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:22.500
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:26.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">01:16.850</td>
+                <td class="time">01:26.200</td>
+                <td class="time">8.7</td>
+                
+                    <td class="time">+21.300</td>
+                
+            </tr>
+        
+            
+                <tr class="tr_alt_2">
+            
+                <td>6</td>
+                <td>SimplStuff</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:38.450
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:33.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:54.600
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:41.950
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:20.750
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:28.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:28.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:29.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:26.450
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:26.850
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:26.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:32.750
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:29.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:32.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:37.050
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:26.050
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">0.000</td>
+                <td class="time">01:26.550</td>
+                <td class="time">22.9</td>
+                
+                    <td class="time">-</td>
+                
+            </tr>
+        
+            
+                <tr class="tr_alt_1">
+            
+                <td>7</td>
+                <td>Feohtan_</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:37.300
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:33.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            02:02.450
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            01:52.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:28.750
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:43.600
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:39.000
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:37.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:33.050
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:33.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:37.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:35.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:34.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:37.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:34.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">0.000</td>
+                <td class="time">01:27.050</td>
+                <td class="time">32.7</td>
+                
+                    <td class="time">-</td>
+                
+            </tr>
+        
+            
+                <tr class="tr_alt_2">
+            
+                <td>8</td>
+                <td>jimnwer</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:45.650
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            02:04.800
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            02:02.400
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:36.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:43.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:46.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:35.150
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:46.750
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:31.100
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:44.400
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:43.600
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">0.000</td>
+                <td class="time">01:08.250</td>
+                <td class="time">51.0</td>
+                
+                    <td class="time">-</td>
+                
+            </tr>
+        
+            
+                <tr class="tr_alt_1">
+            
+                <td>9</td>
+                <td>cangod0910</td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            02:56.950
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            02:25.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            02:17.250
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time pit_last">
+                    
+                        
+                            02:38.850
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            01:57.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            02:22.400
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            02:11.200
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            02:45.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            02:10.700
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            02:16.350
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                    
+                        <td class="tooltip time">
+                    
+                        
+                            -
+                        
+                        <span class="tooltip-text">
+                            <p>soon</p>
+                        </span>
+                    </td>
+                
+                <td class="time">0.000</td>
+                <td class="time">01:24.850</td>
+                <td class="time">72.1</td>
+                
+                    <td class="time">-</td>
+                
+            </tr>
+        
+    </table>
+
+    <script defer>
+        const table = document.getElementById("table")
+
+        const lookup = {
+            1: "gold",
+            2: "silver",
+            3: "#cd7f32",
+        }
+
+        for (let i = 0; i < table.children.item(0).children.length; i++) {
+            const element = table.children.item(0).children.item(i);
+
+            if (i in lookup) {
+                element.style.color = lookup[i]
+            }
+            
+        }
+    </script>
+    
+</body>
+</html>

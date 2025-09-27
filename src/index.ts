@@ -221,6 +221,7 @@ export class SWRC {
 					<p>Status: <span class="ok">All Systems "Operational"</span></p>
 					<p>For future me: If you are reading this, congratulations for beating nginx</p>
 					<p>they call me "the nginx beater"</p>
+					<p>${this.sessions}</p>
 				</div>
 				</body>
 				</html>
