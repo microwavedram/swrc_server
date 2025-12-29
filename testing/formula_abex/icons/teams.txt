@@ -1,0 +1,3 @@
+AeternusS-min.png: "Aternus Racing"
+AshkavarOcelots.png: "Ashkavari Ocelots"
+axolotl_optimized.png: "Wharf Axolcedes"
