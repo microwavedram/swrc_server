@@ -2,5 +2,8 @@
 This repository is synced to the central server (https://swrc.cloudmc.uk/)
 
 ## Structure
-/<organisation>/<team>/icon.png
-/<organisation>/<team>/members.txt
+- /organisation/team/icon.png
+- /organisation/team/members.txt
+
+members.txt should have one name per line
+
