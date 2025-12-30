@@ -4,15 +4,14 @@ import { WebsocketInterface } from "./util/WebsocketInterface"
 import { RCEndpoint, type PushTrackPacket } from "./services/RC"
 
 import config from "../config.toml"
-import SQLite from "./sqlite"
 import path from "path"
 import { RacerEndpoint } from "./services/Racer"
 import { getHeadToken } from "./util/HeadToken"
 import { Race } from "./Race"
 
 import express from "express"
-import { Key, KeyScope } from "./util/Key"
-import { PROTOCOL, Packets } from "./Protocol"
+import { Key, KeyChain, KeyScope, initKeyChain } from "./util/KeyChain"
+import { Packets } from "./Protocol"
 import { SWRCEndpoint } from "./services/SWRC"
 
 const sleep = async (ms: number) =>
@@ -32,6 +31,8 @@ export class Session {
 	racer_endpoint = new RacerEndpoint(this)
 
 	key: Key | null = null
+
+	status: string = "Probably racing"
 
 	constructor(swrc: SWRC, id: string, owning_key: Key) {
 		this.swrc = swrc
@@ -72,11 +73,11 @@ export class Session {
 }
 
 export class SWRC {
-	sqlite: SQLite
-
 	wsInterface: WebsocketInterface = new WebsocketInterface({})
 
 	sessions: { [id: string]: Session } = {}
+
+	keychain: KeyChain = initKeyChain()
 
 	perf: number = 0
 
@@ -99,65 +100,13 @@ export class SWRC {
 			)
 		})
 
-		if (!fs.existsSync("db")) fs.mkdirSync("db")
-
-		const firstRun = !fs.existsSync("db/db.sqlite")
-
-		this.sqlite = new SQLite("db/db.sqlite")
-
-		if (firstRun) {
-			log.info("SWRC", "Doing first run initialisation")
-			this.sqlite.setup()
-
-			this.sqlite
-				.newKey(
-					new Set([
-						KeyScope.ADMINISTRATOR,
-						KeyScope.WEB,
-						KeyScope.SESSION,
-						KeyScope.RC,
-					]),
-					"Internal Administrator Key",
-					config.default_organisation,
-					-1
-				)
-				.then((key) => {
-					log.info("SWRC", "Administrator key: " + key.toKeyString())
-				})
-		}
-
 		if (!fs.existsSync("./races")) {
 			fs.mkdirSync("./races")
 		}
 
-		if (process.argv[2] == "--keygen") {
-			const label = process.argv[3]
-			const org = process.argv[4]
-
-			this.sqlite
-				.newKey(new Set([KeyScope.SESSION]), label, org, -1)
-				.then((key) => {
-					log.info("SWRC", "Generated key: " + key.toKeyString())
-				})
+		if (process.argv[2] == "--init") {
+			this.keychain.initial_sign_keys()
 		}
-	}
-
-	async webAuth(username: string, password: string): Promise<boolean> {
-		log.verbose(username, password)
-
-		const key = Key.parseKey(password)
-
-		if (key.isErr()) return false
-
-		const is_key = await this.sqlite.validateKey(key.value)
-
-		if (is_key.isErr() || is_key.value === false) return false
-
-		if (key.value.scopes.has(KeyScope.WEB)) {
-			return true
-		}
-
-		return false
 	}
 
 	async start() {
@@ -217,10 +166,9 @@ export class SWRC {
 				</head>
 				<body>
 				<div class="container">
-					<h1>SWRC v3.0.0</h1>
+					<h1>SWRC v4.0.0</h1>
 					<p>Status: <span class="ok">All Systems "Operational"</span></p>
 					<p>For future me: If you are reading this, congratulations for beating nginx</p>
-					<p>they call me "the nginx beater"</p>
 				</div>
 				</body>
 				</html>
@@ -244,9 +192,12 @@ export class SWRC {
 				sessions[id] = {
 					perf: session.perf,
 					state:
-						session.race != null
-							? `[${session.race.id}] ${session.race.racers.length} players @ ${session.race.track.name}`
-							: "Inactive",
+						session.race !== null
+							? `${session.race?.id} @ ${
+									session.race?.track?.name ?? "None"
+							  }`
+							: "None",
+					status: session.status,
 				}
 			}
 

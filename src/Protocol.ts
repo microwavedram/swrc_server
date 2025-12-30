@@ -19,10 +19,12 @@ export const enum Packets {
 	/* $rc */ TIMER = 0x14,
 	/* $rc */ POP_FLAP = 0x15,
 	/* $rc */ REORDER = 0x16,
+	/* $rc */ TOGGLE_TRACKING = 0x17,
 
 	/* $swrc */ CREATENEWSESSION = 0x40,
 	/* $swrc */ NEWSESSION = 0x41,
 	/* $swrc */ ENDSESSION = 0x42,
+	/* $swrc */ NAMESESSION = 0x43,
 	/* $swrc */ SESSIONS = 0x4f,
 
 	/* $rc $racer */ HEARTBEAT = 0xff,

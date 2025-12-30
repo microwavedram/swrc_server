@@ -427,8 +427,6 @@ export class Race {
 				const latest_flap = flap.racer.flap
 
 				if (latest_flap != null) {
-					log.verbose("RACE", "updating flap lap deltas ")
-
 					const latest_split =
 						flap.racer.splits[flap.racer.splits.length - 1]
 
@@ -658,6 +656,52 @@ export class Race {
 			lap_map[racer.name] = racer.lap
 		})
 
+		const racer_clients: {
+			[username: string]: {
+				version: string
+				clock_precise: boolean
+				clock_precision: number
+			}
+		} = {}
+
+		const rc_clients: {
+			[username: string]: {
+				version: string
+				tracking: boolean
+				clock_precise: boolean
+				clock_precision: number
+			}
+		} = {}
+
+		this.session.rc_endpoint.clients.forEach((client) => {
+			const aws: AuthWebsocket = client as AuthWebsocket
+
+			if (aws.rc$authenticated) {
+				if (aws.handshake) {
+					rc_clients[aws.handshake.username] = {
+						tracking: aws.rc$authorized_checkpoints,
+						version: aws.handshake.version,
+						clock_precise: aws.rc$clock_precise,
+						clock_precision: aws.rc$clock_precision,
+					}
+				}
+			}
+		})
+
+		this.session.racer_endpoint.clients.forEach((client) => {
+			const aws: AuthWebsocket = client as AuthWebsocket
+
+			if (aws.racer$authenticated) {
+				if (aws.handshake) {
+					racer_clients[aws.handshake.username] = {
+						version: aws.handshake.version,
+						clock_precise: aws.rc$clock_precise,
+						clock_precision: aws.rc$clock_precision,
+					}
+				}
+			}
+		})
+
 		this.session.racer_endpoint.clients.forEach((client) => {
 			this.session.racer_endpoint.sendPacket(
 				client as AuthWebsocket,
@@ -672,6 +716,8 @@ export class Race {
 					flap: this.flap_stack[this.flap_stack.length - 1],
 					timer_start: this.timer_start,
 					timer_duration: this.timer_duration,
+					rc_clients: rc_clients,
+					racer_clients: racer_clients,
 				}
 			)
 		})

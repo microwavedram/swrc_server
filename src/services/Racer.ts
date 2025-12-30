@@ -1,7 +1,7 @@
 import type { IncomingMessage } from "http"
 import { WebsocketEndpoint } from "../util/WebsocketEndpoint"
 import { parse } from "url"
-import { KeyScope } from "../util/Key"
+import { KeyScope } from "../util/KeyChain"
 
 import log from "npmlog"
 import type { AuthWebsocket } from "../util/Websocket"

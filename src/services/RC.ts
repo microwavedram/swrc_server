@@ -2,13 +2,14 @@ import type { IncomingMessage } from "http"
 import { WebsocketEndpoint } from "../util/WebsocketEndpoint"
 import { parse } from "url"
 import log from "npmlog"
-import { Key, KeyScope } from "../util/Key"
+import { Key, KeyScope } from "../util/KeyChain"
 import type { AuthWebsocket } from "../util/Websocket"
 import type { RaceState, SpeedTrapResult } from "../Race"
 import { semverToInt } from "../util/Ver"
 import { Session } from ".."
 import { PROTOCOL, Packets } from "../Protocol"
 import config from "../../config.toml"
+import fs from "fs"
 
 export const enum ModifyRacerPacketAction {
 	ADD = "ADD",
@@ -85,6 +86,15 @@ export interface Reorder {
 	order: string[]
 }
 
+export interface RaceEndPacket {
+	dump: boolean | undefined
+}
+
+export interface RaceControllerStatePacket {
+	controller: string
+	state: boolean
+}
+
 export class RCEndpoint extends WebsocketEndpoint<Packets> {
 	session: Session
 
@@ -101,13 +111,17 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 
 		const key = Key.parseKey(auth as string)
 
-		if (key.isErr()) return false
+		if (key.isErr()) {
+			log.verbose("RC", "Failed to parse key: " + key.error)
+			return false
+		}
 
-		const validKey = (
-			await this.session.swrc.sqlite.validateKey(key.value)
-		).unwrapOr(false)
+		const validKey = this.session.swrc.keychain.verifyKey(key.value)
 
-		if (!validKey) return false
+		if (!validKey) {
+			log.verbose("RC", "Failed to verify key")
+			return false
+		}
 
 		if (key.value.scopes.has(KeyScope.ADMINISTRATOR)) return true
 
@@ -129,7 +143,13 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 
 		switch (packetType) {
 			case Packets.HANDSHAKE:
-				const { username, uuid, version } = JSON.parse(data.toString())
+				const {
+					username,
+					uuid,
+					version,
+					clock_precise,
+					clock_precision,
+				} = JSON.parse(data.toString())
 
 				if (!username || !uuid || !version) {
 					return
@@ -157,6 +177,11 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 
 				client.rc$authenticated = true
 
+				if (clock_precise !== undefined)
+					client.rc$clock_precise = clock_precise
+				if (clock_precision !== undefined)
+					client.rc$clock_precision = clock_precision
+
 				log.info(
 					"RC",
 					`${username} connected on ${version} ${semverToInt(
@@ -168,9 +193,18 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 					motd: config.motd.rc,
 				})
 
+				if (semverToInt(version) < 400) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message:
+							"§cWARNING!!!!! You are on an OUTDATED version of SWRC, you are able to connect as an RC but CHECKPOINTS WILL NOT SYNC. Upgrade to v4.0.0.",
+					})
+				}
+
 				break
 			case Packets.LINECROSS:
 				const linecrosses = JSON.parse(data.toString()) as LineCrosses
+
+				if (client.rc$authorized_checkpoints !== true) return
 
 				if (this.session.race) {
 					for (const [checkpoint_id, players] of Object.entries(
@@ -248,6 +282,8 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 			case Packets.PITCROSS:
 				const pitcrosses = JSON.parse(data.toString()) as PitCrosses
 
+				if (client.rc$authorized_checkpoints !== true) return
+
 				if (this.session.race) {
 					pitcrosses.pit_crosses.forEach((name) => {
 						this.session.race?.handlePitCross(
@@ -267,6 +303,8 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 				const pitEnterCrosses = JSON.parse(
 					data.toString()
 				) as PitEnterCrosses
+
+				if (client.rc$authorized_checkpoints !== true) return
 
 				if (this.session.race) {
 					pitEnterCrosses.pit_enter_crosses.forEach((name) => {
@@ -292,13 +330,25 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 
 				break
 			case Packets.ENDRACE:
+				const endrace = JSON.parse(data.toString()) as RaceEndPacket
+
 				if (this.session.race) {
+					const raceid = this.session.race.id
+
 					this.session.endRace()
+
+					if (endrace.dump) {
+						if (fs.existsSync(`./races/${raceid}.race`)) {
+							fs.rmSync(`./races/${raceid}.race`)
+						}
+					}
 				}
 
 				break
 			case Packets.SPEEDTRAP:
 				const speedTrap = JSON.parse(data.toString()) as SpeedTrapPacket
+
+				if (client.rc$authorized_checkpoints !== true) return
 
 				if (this.session.race) {
 					log.verbose("RC", speedTrap)
@@ -345,6 +395,52 @@ export class RCEndpoint extends WebsocketEndpoint<Packets> {
 					this.session.race.race_leaderboard =
 						this.session.race.rebuildLeaderboard()
 				}
+
+				break
+			case Packets.TOGGLE_TRACKING:
+				const controller_state = JSON.parse(
+					data.toString()
+				) as RaceControllerStatePacket
+
+				this.clients.forEach((client) => {
+					if (
+						(client as AuthWebsocket).handshake?.username ==
+						controller_state.controller
+					) {
+						if (
+							(client as AuthWebsocket).rc$clock_precise !== true
+						) {
+							this.sendPacket(
+								client as AuthWebsocket,
+								Packets.MESSAGE,
+								{
+									message: `Failed to update ${
+										(client as AuthWebsocket).handshake
+											?.username
+									}'s tracking to ${
+										controller_state.state === true
+									} as their system clock is not syncronised.`,
+								}
+							)
+							return
+						}
+
+						;(client as AuthWebsocket).rc$authorized_checkpoints =
+							controller_state.state === true
+						this.sendPacket(
+							client as AuthWebsocket,
+							Packets.MESSAGE,
+							{
+								message: `Updated ${
+									(client as AuthWebsocket).handshake
+										?.username
+								}'s tracking to ${
+									controller_state.state === true
+								}`,
+							}
+						)
+					}
+				})
 
 				break
 			default:

@@ -1,6 +1,7 @@
-node_modules
-.env
-db
+/node_modules
+/.env
 /swrc.log
 /races
 *.log
+/.venv
+/keys

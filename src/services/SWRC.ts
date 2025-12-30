@@ -1,7 +1,7 @@
 import type { IncomingMessage } from "http"
 import { WebsocketEndpoint } from "../util/WebsocketEndpoint"
 import { parse } from "url"
-import { Key, KeyScope, PROTO } from "../util/Key"
+import { Key, KeyScope } from "../util/KeyChain"
 
 import log from "npmlog"
 import type { AuthWebsocket } from "../util/Websocket"
@@ -25,6 +25,12 @@ export interface DestroySessionPacket {
 	key: string
 }
 
+export interface RenameSessionPacket {
+	session: string
+	key: string
+	name: string
+}
+
 export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 	swrc: SWRC
 
@@ -39,9 +45,7 @@ export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 
 		if (key.isErr()) return false
 
-		const validKey = (
-			await this.swrc.sqlite.validateKey(key.value)
-		).unwrapOr(false)
+		const validKey = this.swrc.keychain.verifyKey(key.value)
 
 		if (!validKey) return false
 
@@ -117,17 +121,18 @@ export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 
 				const key = Key.parseKey(packet.key)
 				if (key.isErr()) {
+					log.verbose("SWRC", "FAILED KEY DECODE " + key.error)
 					this.sendPacket(client, Packets.MESSAGE, {
 						message: `Invalid key`,
 					})
 					return
 				}
 
-				const valid = await this.swrc.sqlite.validateKey(key.value)
+				const valid = await this.swrc.keychain.verifyKey(key.value)
 
-				if (valid.isErr() || valid.value == false) {
+				if (valid !== true) {
 					this.sendPacket(client, Packets.MESSAGE, {
-						message: `Invalid key`,
+						message: `Failed Signature`,
 					})
 					return
 				}
@@ -153,20 +158,18 @@ export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 					return
 				}
 
-				const organisation = await this.swrc.sqlite.getKeyOrg(key.value)
+				const organisation = key.value.org
 
-				const id = `${organisation.unwrapOr("<unknown>")}_${randomBytes(
-					4
-				).toString("hex")}`
+				const id = `${organisation}_${randomBytes(2).toString("hex")}`
 
 				const session = new Session(this.swrc, id, key.value)
 
 				this.swrc.sessions[id] = session
 
-				const race_key = await this.swrc.sqlite.newKey(
-					new Set([KeyScope.RC]),
-					`SessionFor->${key.value.toKeyString()}`,
-					organisation.unwrapOr("<unknown>")
+				const race_key = this.swrc.keychain.newKey(
+					id,
+					organisation,
+					new Set([KeyScope.RC])
 				)
 
 				session.key = race_key
@@ -192,16 +195,19 @@ export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 					return
 				}
 
-				const valid2 = await this.swrc.sqlite.validateKey(key2.value)
+				const valid2 = await this.swrc.keychain.verifyKey(key2.value)
 
-				if (valid2.isErr() || valid2.value == false) {
+				if (valid2 !== true) {
 					this.sendPacket(client, Packets.MESSAGE, {
-						message: `Invalid key`,
+						message: `Failed Signature`,
 					})
 					return
 				}
 
-				if (!key2.value.scopes.has(KeyScope.SESSION)) {
+				if (
+					!key2.value.scopes.has(KeyScope.SESSION) &&
+					!key2.value.scopes.has(KeyScope.ADMINISTRATOR)
+				) {
 					this.sendPacket(client, Packets.MESSAGE, {
 						message: `Unauthorized`,
 					})
@@ -225,6 +231,56 @@ export class SWRCEndpoint extends WebsocketEndpoint<Packets> {
 				session2.rc_endpoint.close()
 
 				delete this.swrc.sessions[end_session_packet.session]
+
+				break
+
+			case Packets.NAMESESSION:
+				let name_session_packet = JSON.parse(
+					data.toString()
+				) as RenameSessionPacket
+
+				if (!this.validToken(name_session_packet.key)) return
+
+				const key3 = Key.parseKey(name_session_packet.key)
+				if (key3.isErr()) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Invalid key`,
+					})
+					return
+				}
+
+				const valid3 = await this.swrc.keychain.verifyKey(key3.value)
+
+				if (valid3 !== true) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Failed Signature`,
+					})
+					return
+				}
+
+				if (
+					!key3.value.scopes.has(KeyScope.SESSION) &&
+					!key3.value.scopes.has(KeyScope.ADMINISTRATOR)
+				) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Unauthorized`,
+					})
+					return
+				}
+
+				const session3 = this.swrc.sessions[name_session_packet.session]
+
+				if (
+					!session3.owning_key.equals(key3.value) &&
+					!key3.value.scopes.has(KeyScope.ADMINISTRATOR)
+				) {
+					this.sendPacket(client, Packets.MESSAGE, {
+						message: `Not your session`,
+					})
+					return
+				}
+
+				session3.status = name_session_packet.name
 
 				break
 			default:

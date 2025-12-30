@@ -1,5 +1,4 @@
 server_label = "SWRC Local Test Server"
-default_organisation = "FA"
 
 # Internal update speed
 update_speed = 250
@@ -13,10 +12,52 @@ port = 7777
 # Maximum session for RC
 max_sessions_per = 1
 
+[keychain.org.INTERNAL]
+name = "Internal"
+keys."Administrator" = { mc = "?", contact = "?" }
+
+[keychain.org.FA]
+name = "Formula Abex"
+keys."Saisho" = { mc = "SaishoVibes", contact = "saishovibes" }
+keys."Terraformer" = { mc = "terraformer9", contact = "terraformer" }
+keys."Crazylegs" = { mc = "localhackerman", contact = "microwavedram" }
+
+[keychain.org.EMC]
+name = "EarthMC F1"
+keys."Pie" = { mc = "PieTheHead", contact = "piethehead" }
+
+[keychain.org.TF2]
+name = "Towny F2"
+keys."Pie" = { mc = "PieTheHead", contact = "piethehead" }
+
+[keychain.org.LEAGUE_P]
+name = "League P"
+keys."R6" = { mc = "?", contact = "realr6itcannotbe02" }
+
+[keychain.org.TURKEY]
+name = "Turkey League"
+keys."Subay" = { mc = "SubayAdamm", contact = "subayadamm" }
+
+[keychain.org.EPF1]
+name = "EarthPol F1"
+keys."MattIsOff" = { mc = "MattIsOff", contact = "mattison" }
+
+[keychain.org.EMCF3]
+name = "EarthMC F3"
+keys."MemeReee" = { mc = "memexcx", contact = "memereee" }
+
+[keychain.org.PROPA]
+name = "Propa"
+keys."Seggy" = { mc = "s3ggy", contact = "s3ggy_" }
+
+[keychain.org.F1DMC]
+name = "Diplomatica F1"
+keys."prettyszick" = { mc = "?", contact = "prettyszick" }
+
 [motd]
+swrc = "Welcome to 4.0.0"
 rc = "Remember to set race state!"
-racer = "One must hope for >10tps"
-swrc = ":wave:"
+racer = "FA will be remembered"
 
 # Webserver configuration
 [express]

@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-SWRC_SERVER = "wss://swrc.cloudmc.uk/realtime/"
-VERSION = "v3.0.0"
+SWRC_SERVER = "ws://localhost:7777/"
+VERSION = "v4.0.0"
 
 import json
 import asyncio
 import hashlib
+import random
 import datetime
 import enum
 from websockets.asyncio.client import connect
@@ -34,7 +35,10 @@ class Packet(enum.Enum):
     CREATENEWSESSION = 0x40
     NEWSESSION = 0x41
     ENDSESSION = 0x42
+    NAMESESSION = 0x43,
     SESSIONS = 0x4f
+
+    HEARTBEAT = 0xff
 
 async def hello():
     async with connect(SWRC_SERVER + "?head=" + head_token()) as websocket:
@@ -45,7 +49,7 @@ async def hello():
         while True:
             message = await websocket.recv()
 
-            packet_id = Packet(ord(message[0]))
+            packet_id = Packet(message[0])
             data = json.loads(message[1:])
 
             if packet_id == Packet.HELLO:
@@ -85,12 +89,14 @@ async def hello():
         
         print("Selected", session)
 
+        print(SWRC_SERVER + session + "/racer?head=" + head_token())
+
         async with connect(SWRC_SERVER + session + "/racer?head=" + head_token()) as websocket:
 
             print("Sending handshake")
             await websocket.send(
                 "\x00\x01" + json.dumps({
-                    "username": "swrc_python_client",
+                    "username": "swrc_python_client_" + str(hex(random.getrandbits(32))[2:]),
                     "uuid": "169d2585-3e6a-4e8a-8e80-deaddeaddead",
                     "agent": "Python/SWRC",
                     "version": VERSION
@@ -104,7 +110,7 @@ async def hello():
             while True:
                 message = await websocket.recv()
 
-                packet_id = Packet(ord(message[0]))
+                packet_id = Packet(message[0])
                 data = json.loads(message[1:])
 
                 if packet_id == Packet.NEWRACE:
@@ -114,6 +120,8 @@ async def hello():
 
                     print(f"Recieved new race! [{race_id}] at {race_track_name}")
                 elif packet_id == Packet.UPDATE:
+                    print(data["rc_clients"])
+
                     for row in data["race_leaderboard"]:
                         name = row["player_name"]
                         print(name, data["racer_laps"][name], data["racer_pits"][name])
