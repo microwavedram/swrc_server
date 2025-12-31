@@ -52,7 +52,7 @@ keys."Seggy" = { mc = "s3ggy", contact = "s3ggy_" }
 
 [keychain.org.F1DMC]
 name = "Diplomatica F1"
-keys."prettyszick" = { mc = "?", contact = "prettyszick" }
+keys."Szick" = { mc = "?", contact = "prettyszick" }
 
 [motd]
 swrc = "Welcome to 4.0.0"
