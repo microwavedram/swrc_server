@@ -134,17 +134,80 @@ export class SWRC {
 						<meta charset="utf-8" />
 						<title>Race File: ${filename}</title>
 						<style>
-						body { font-family: sans-serif; background: #f9f9f9; padding: 2em; }
-						pre { background: #eee; padding: 1em; border-radius: 5px; }
+							body {
+								background: #0a0a0a;
+								font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+								color: #e0e0e0;
+								margin: 0;
+								padding: 40px;
+								min-height: 100vh;
+							}
+							.container {
+								max-width: 1200px;
+								margin: 0 auto;
+								background: #000000;
+								border: 1px solid #ffffff;
+							}
+							h1 {
+								font-size: 1.5em;
+								margin: 0;
+								padding: 20px;
+								color: #ffffff;
+								background: #000000;
+								border-bottom: 1px solid #ffffff;
+								text-transform: uppercase;
+								letter-spacing: 2px;
+								font-weight: 500;
+							}
+							.actions {
+								padding: 15px 20px;
+								border-bottom: 1px solid #333333;
+								background: #000000;
+							}
+							.download-button {
+								display: inline-block;
+								padding: 7px 16px;
+								background: #000000;
+								color: #4a9eff;
+								text-decoration: none;
+								border: 1px solid #4a9eff;
+								font-weight: 500;
+								font-family: 'Consolas', monospace;
+								text-transform: uppercase;
+								transition: all 0.15s;
+								letter-spacing: 1px;
+								font-size: 0.85em;
+							}
+							.download-button:hover {
+								background: #4a9eff;
+								color: #000000;
+							}
+							pre {
+								background: #0a0a0a;
+								padding: 20px;
+								margin: 0;
+								color: #e0e0e0;
+								font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+								font-size: 0.9em;
+								line-height: 1.6;
+								overflow-x: auto;
+								border: none;
+							}
 						</style>
 					</head>
 					<body>
-						<h1>${filename}</h1>
-						<a href="${encodeURIComponent(filename)}" download>Download Race File</a>
-						<pre>${data
-							.replace(/&/g, "&amp;")
-							.replace(/</g, "&lt;")
-							.replace(/>/g, "&gt;")}</pre>
+						<div class="container">
+							<h1>${filename}</h1>
+							<div class="actions">
+								<a href="${encodeURIComponent(
+									filename
+								)}" download class="download-button">Download Race File</a>
+							</div>
+							<pre>${data
+								.replace(/&/g, "&amp;")
+								.replace(/</g, "&lt;")
+								.replace(/>/g, "&gt;")}</pre>
+						</div>
 					</body>
 					</html>
 				`)
@@ -152,6 +215,31 @@ export class SWRC {
 		})
 
 		this.express.enable("trust proxy")
+
+		// API endpoint for sessions data
+		this.express.get("/api/sessions", (req, res) => {
+			const sessionsData: { [id: string]: any } = {}
+
+			for (const [id, session] of Object.entries(this.sessions)) {
+				sessionsData[id] = {
+					id: id,
+					perf: session.perf,
+					status: session.status,
+					raceId: session.race?.id ?? null,
+					trackName: session.race?.track?.name ?? null,
+					hasRace: session.race !== null,
+					organization:
+						(config.keychain.org as any)[session.owning_key.org]
+							.name ?? "Unknown",
+				}
+			}
+
+			res.json({
+				sessions: sessionsData,
+				perf: this.perf,
+				timestamp: new Date().toISOString(),
+			})
+		})
 
 		this.express.use("/", express.static("public"))
 		this.express.get("/", (request, response) => {
@@ -161,15 +249,80 @@ export class SWRC {
 				<head>
 				<meta charset="UTF-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Status Page</title>
+				<title>SWRC Status</title>
 				<link rel="stylesheet" href="/style.css" />
 				</head>
 				<body>
 				<div class="container">
 					<h1>SWRC v4.0.0</h1>
-					<p>Status: <span class="ok">All Systems "Operational"</span></p>
-					<p>For future me: If you are reading this, congratulations for beating nginx</p>
+					<p>Status: <span class="ok">All Systems Operational</span></p>
+					<p>Browser leaderboards coming soon!</p>
+					
+					<div id="sessions-container">
+						<h2>Active Sessions</h2>
+						<div id="sessions-list">
+							<p class="loading">Loading sessions...</p>
+						</div>
+					</div>
 				</div>
+				
+				<script>
+					async function loadSessions() {
+						try {
+							const response = await fetch("/api/sessions");
+							const data = await response.json();
+							
+							const sessionsList = document.getElementById("sessions-list");
+							const sessions = data.sessions;
+							const sessionIds = Object.keys(sessions);
+							
+							if (sessionIds.length === 0) {
+								sessionsList.innerHTML = "<p class=\\"no-sessions\\">No active sessions</p>";
+								return;
+							}
+							
+							sessionsList.innerHTML = sessionIds.map(id => {
+								const session = sessions[id];
+								const perfMs = session.perf.toFixed(2);
+								
+								let raceInfo = "";
+								if (session.hasRace && session.raceId) {
+									raceInfo = \`
+										<div class="race-info">
+											<strong>Race:</strong> \${session.raceId}<br>
+											<strong>Track:</strong> \${session.trackName || "Unknown"}<br>
+											<a href="/races/\${session.raceId}" class="race-button" target="_blank">View Race</a>
+										</div>
+									\`;
+								} else {
+									raceInfo = "<p class=\\"no-race\\">No active race</p>";
+								}
+								
+								return \`
+									<div class=\\"session-card\\">
+										<div class=\\"session-header\\">
+											<span class=\\"session-id\\">\${session.organization} - \${id.split("_")[1] || "Unknown"}</span>
+											<span class=\\"session-perf\\">\${perfMs}ms</span>
+										</div>
+										<div class=\\"session-status\\">\${session.status}</div>
+										\${raceInfo}
+									</div>
+								\`;
+							}).join("");
+							
+						} catch (error) {
+							console.error("Failed to load sessions:", error);
+							document.getElementById("sessions-list").innerHTML = 
+								"<p class=\\"error\\">Failed to load sessions</p>";
+						}
+					}
+					
+					// Load sessions immediately
+					loadSessions();
+					
+					// Refresh every 2 seconds
+					setInterval(loadSessions, 2000);
+				</script>
 				</body>
 				</html>
 			`)

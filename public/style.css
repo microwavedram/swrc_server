@@ -5,59 +5,209 @@
 }
 
 body {
-  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1a1a1a);
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
-  font-family: 'Segoe UI', sans-serif;
-  color: #f0f0f0;
+  background: #0a0a0a;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  color: #e0e0e0;
   margin: 0;
   padding: 0;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .container {
-  max-width: 600px;
-  margin: 80px auto;
-  background: rgba(20, 20, 20, 0.85);
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.7);
-  text-align: center;
+  max-width: 900px;
+  margin: 40px auto;
+  background: #000000;
+  padding: 0;
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 0 1px #000000;
 }
 
 h1 {
-  font-size: 3em;
-  margin-bottom: 20px;
-  color: #00bcd4;
+  font-size: 1.8em;
+  margin: 0;
+  padding: 20px;
+  color: #ffffff;
+  background: #000000;
+  border-bottom: 1px solid #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 500;
+}
+
+h2 {
+  font-size: 1.2em;
+  margin: 0;
+  padding: 15px 20px;
+  color: #ffffff;
+  background: #000000;
+  border-top: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 500;
+}
+
+.container > p {
+  padding: 10px 20px;
+  margin: 0;
+  border-bottom: 1px solid #1a1a1a;
+  font-size: 0.95em;
 }
 
 .ok {
-  color: #4caf50;
-  font-weight: bold;
-  font-size: 1.2em;
+  color: #4a9eff;
+  font-weight: 600;
 }
 
 .dot {
-  height: 12px;
-  width: 12px;
-  background-color: #4caf50;
-  border-radius: 50%;
+  height: 6px;
+  width: 6px;
+  background-color: #4a9eff;
   display: inline-block;
-  box-shadow: 0 0 5px #4caf50, 0 0 10px #4caf50;
-  animation: pulse 1.5s infinite;
+  animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
+  0%, 100% {
     opacity: 1;
   }
   50% {
-    transform: scale(1.5);
-    opacity: 0.6;
+    opacity: 0.4;
   }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+}
+
+#sessions-container {
+  padding: 20px;
+}
+
+#sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 15px;
+  border: 1px solid #333333;
+}
+
+.session-card {
+  background: #000000;
+  border: none;
+  border-bottom: 1px solid #1a1a1a;
+  padding: 16px 20px;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.session-card:last-child {
+  border-bottom: none;
+}
+
+.session-card:hover {
+  background: #0a0a0a;
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.session-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.session-id {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #ffffff;
+  font-family: 'Consolas', monospace;
+  letter-spacing: 0.5px;
+}
+
+.session-org {
+  font-size: 0.85em;
+  color: #666666;
+  font-family: 'Consolas', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.session-perf {
+  background: #000000;
+  color: #4a9eff;
+  padding: 4px 12px;
+  border: 1px solid #333333;
+  font-size: 0.85em;
+  font-weight: 500;
+  font-family: 'Consolas', monospace;
+}
+
+.session-status {
+  color: #999999;
+  margin-bottom: 12px;
+  font-family: 'Consolas', monospace;
+  font-size: 0.9em;
+}
+
+.race-info {
+  background: #0a0a0a;
+  padding: 14px;
+  border: 1px solid #1a1a1a;
+  border-left: 2px solid #4a9eff;
+  line-height: 1.7;
+  font-family: 'Consolas', monospace;
+  font-size: 0.9em;
+}
+
+.race-info strong {
+  color: #ffffff;
+  margin-right: 8px;
+  font-weight: 600;
+}
+
+.race-button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 7px 16px;
+  background: #000000;
+  color: #4a9eff;
+  text-decoration: none;
+  border: 1px solid #4a9eff;
+  font-weight: 500;
+  font-family: 'Consolas', monospace;
+  text-transform: uppercase;
+  transition: all 0.15s;
+  letter-spacing: 1px;
+  font-size: 0.85em;
+}
+
+.race-button:hover {
+  background: #4a9eff;
+  color: #000000;
+}
+
+.no-race {
+  color: #666666;
+  font-family: 'Consolas', monospace;
+  margin: 10px 0;
+  font-size: 0.9em;
+}
+
+.no-sessions, .loading, .error {
+  color: #999999;
+  font-family: 'Consolas', monospace;
+  padding: 30px 20px;
+  text-align: center;
+  border: 1px solid #1a1a1a;
+  background: #000000;
+  font-size: 0.95em;
+}
+
+.error {
+  color: #ff4a4a;
+  border-color: #ff4a4a;
 }
