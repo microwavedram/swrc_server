@@ -41,6 +41,7 @@ keys."Subay" = { mc = "SubayAdamm", contact = "subayadamm" }
 [keychain.org.EPF1]
 name = "EarthPol F1"
 keys."MattIsOff" = { mc = "MattIsOff", contact = "mattison" }
+keys."7Nef" = { mc = "?", contact = "1nefarious" }
 
 [keychain.org.EMCF3]
 name = "EarthMC F3"
@@ -53,6 +54,14 @@ keys."Seggy" = { mc = "s3ggy", contact = "s3ggy_" }
 [keychain.org.F1DMC]
 name = "Diplomatica F1"
 keys."Szick" = { mc = "?", contact = "prettyszick" }
+
+[keychain.org.ARC]
+name = "Abexlias Racing Championship"
+keys."Swift" = { mc = "Swift_Master", contact = "swiftmaster1" }
+keys."Nikolai" = { mc = "Urgentpancake", contact = "arctixgamer" }
+keys."Possum" = { mc = "PossumRow", contact = "possumrow" }
+keys."Gifted" = { mc = "GiftedTuba", contact = "giftedtuba" }
+keys."Kaz" = { mc = "kazimierz3wielki", contact = "kazimierz_3_wielki" }
 
 [motd]
 swrc = "Welcome to 4.0.0"
