@@ -20,7 +20,7 @@ keys."Administrator" = { mc = "?", contact = "?" }
 name = "Formula Abex"
 keys."Saisho" = { mc = "SaishoVibes", contact = "saishovibes" }
 keys."Terraformer" = { mc = "terraformer9", contact = "terraformer" }
-keys."Crazylegs" = { mc = "localhackerman", contact = "microwavedram" }
+keys."Crazylegs" = { mc = "localhackerman", contact = "microwavedram", inc = 1 }
 
 [keychain.org.EMC]
 name = "EarthMC F1"
