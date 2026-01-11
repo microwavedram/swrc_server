@@ -398,6 +398,8 @@ export class Race {
 		let leaderboard: RaceLeaderboardObject[] = []
 
 		if (this.state == RaceState.QUALI) {
+			if (this.racers.length == 0) return []
+			
 			let flaps: {
 				racer: Racer
 				time: number
