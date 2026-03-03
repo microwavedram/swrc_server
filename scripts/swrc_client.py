@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-SWRC_SERVER = "ws://localhost:7777/"
+SWRC_SERVER = "wss://swrc.cloudmc.uk/realtime/"
 VERSION = "v4.0.0"
 
 import json
@@ -60,6 +60,7 @@ async def hello():
                break
         
         print("Connected to " + server_label)
+        print(head_token())
 
 
         if len(sessions) == 0:
@@ -125,6 +126,8 @@ async def hello():
                     for row in data["race_leaderboard"]:
                         name = row["player_name"]
                         print(name, data["racer_laps"][name], data["racer_pits"][name])
+                elif packet_id == Packet.HEARTBEAT:
+                    pass
                 else: print("S2C", packet_id, data)
 
 
