@@ -22,6 +22,12 @@ keys."Saisho" = { mc = "SaishoVibes", contact = "saishovibes" }
 keys."Terraformer" = { mc = "terraformer9", contact = "terraformer" }
 keys."Crazylegs" = { mc = "localhackerman", contact = "microwavedram", inc = 1 }
 
+[keychain.org.IBRL]
+name = "International boat racing league"
+keys."Saisho" = { mc = "SaishoVibes", contact = "saishovibes" }
+keys."Kaz" = { mc = "kazimierz3wielki", contact = "kazimierz_3_wielki" }
+keys."Miesneus" = { mc = "Miesneus", contact = "miesneus" }
+
 [keychain.org.EMC]
 name = "EarthMC F1"
 keys."Pie" = { mc = "PieTheHead", contact = "piethehead" }
@@ -60,9 +66,6 @@ keys."Szick" = { mc = "?", contact = "prettyszick" }
 name = "Abexlias Racing Championship"
 keys."Swift" = { mc = "Swift_Master", contact = "swiftmaster1" }
 keys."Nikolai" = { mc = "Urgentpancake", contact = "arctixgamer" }
-keys."Possum" = { mc = "PossumRow", contact = "possumrow" }
-keys."Gifted" = { mc = "GiftedTuba", contact = "giftedtuba" }
-keys."Kaz" = { mc = "kazimierz3wielki", contact = "kazimierz_3_wielki" }
 
 [motd]
 swrc = "Welcome to 4.0.0"
