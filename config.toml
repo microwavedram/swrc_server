@@ -47,8 +47,8 @@ keys."Subay" = { mc = "SubayAdamm", contact = "subayadamm" }
 [keychain.org.EPF1]
 name = "EarthPol F1"
 keys."MattIsOff" = { mc = "MattIsOff", contact = "mattison" }
-keys."7Nef" = { mc = "?", contact = "1nefarious" }
 keys."Pwnings" = { mc = "pwnings", contact = "pwns." }
+keys."AkselV" = { mc = "AkselV", contact = "aksel_v" }
 
 [keychain.org.EMCF3]
 name = "EarthMC F3"
