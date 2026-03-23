@@ -67,6 +67,10 @@ name = "Abexlias Racing Championship"
 keys."Swift" = { mc = "Swift_Master", contact = "swiftmaster1" }
 keys."Nikolai" = { mc = "Urgentpancake", contact = "arctixgamer" }
 
+[keychain.org.CR]
+name = "Crusalis Chariot Racing"
+keys."Deku" = { mc = "?", contact = "dekufullcowling" }
+
 [motd]
 swrc = "Welcome to 4.0.0"
 rc = "Remember to set race state!"
